@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Diagnostics;
+using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -25,7 +17,31 @@ namespace monitor_app
         public MainPage()
         {
             this.InitializeComponent();
+            communicator = new SerialCommunicator(ListDevicesFinished, Connected);
+            communicator.ListDevicesAsync();
         }
+
+        public void ListDevicesFinished(List<DeviceInformation> devices)
+        {
+            if (devices.Count > 0)
+            {
+                foreach(var dev in devices)
+                {
+                    Debug.WriteLine("COM port: " + dev.Name);
+                    comPortsListView.Items.Add(dev.Name);
+                }
+            }
+            else
+            {
+                comPortsListView.Items.Add("No COM ports available. Please connect a device.");
+            }
+        }
+
+        public void Connected()
+        {
+
+        }
+
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -35,5 +51,7 @@ namespace monitor_app
             mediaElement.SetSource(stream, stream.ContentType);
             mediaElement.Play();
         }
+
+        private SerialCommunicator communicator;
     }
 }

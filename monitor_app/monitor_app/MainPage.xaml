@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
 
         <RelativePanel Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch">
-            <ListView x:Name="listView1">
+            <!--<ListView x:Name="listView1">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="x:String">
                         <Grid>
@@ -34,7 +34,24 @@
                 <x:String>Item 3</x:String>
                 <x:String>Item 4</x:String>
                 <x:String>Item 5</x:String>
+            </ListView>-->
+
+            <ListView x:Name="comPortsListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="47"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="{x:Bind}" Foreground="Red" 
+                           FontSize="14" Grid.Column="1"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </RelativePanel>
+        <Button Content="Button" Grid.Column="1" HorizontalAlignment="Left" Margin="375,132,0,0" VerticalAlignment="Top" Click="Button_Click"/>
     </Grid>
 </Page>
