@@ -48,28 +48,37 @@ io.on('connection', function(socket) {
    });
 });
 
-//var SerialPort = require('serialport');
-//var port = new SerialPort('/dev/ttyAMA0', {
-//   baudRate: 115200,
-//   dataBits: 8,
-//   parity: 'none',
-//   stopBits: 1,
-//   flowControl: false
-//});
-// 
-//port.on('open', function() {
-//  port.write('main screen turn on', function(err) {
-//    if (err) {
-//      return console.log('Error on write: ', err.message);
-//    }
-//    console.log('message written');
-//  });
-//});
-// 
-//// open errors will be emitted as an error event 
-//port.on('error', function(err) {
-//  console.log('Error: ', err.message);
-//});
+var SerialPort = require('serialport');
+var port = new SerialPort('/dev/serial0', {
+   baudRate: 115200,
+   dataBits: 8,
+   parity: 'none',
+   stopBits: 1,
+   flowControl: false
+});
+ 
+port.on('open', function() {
+  port.write('main screen turn on', function(err) {
+    if (err) {
+      return console.log('Error on write: ', err.message);
+    }
+    console.log('message written');
+  });
+});
+
+var uartRecv = '';
+port.on('data', function(data) {
+  uartRecv += data;
+  if (data.indexOf('d') != -1) {
+    console.log('Data received throguh UART: ', uartRecv);
+    uartRecv = '';
+  }
+});
+ 
+// open errors will be emitted as an error event 
+port.on('error', function(err) {
+  console.log('Error: ', err.message);
+});
 
 http.listen(8080, function() {
    console.log('listening on *:8080');
