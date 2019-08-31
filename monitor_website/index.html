@@ -9,23 +9,30 @@
         var socket = io();
         socket.emit('clientEvent', 'Sent an event from the client!');
         //socket.on('testerEvent', function(data){ document.write(data.desc) });
+
+        socket.on('debugParamValues', updateDebugParamValues);
         
         function debugParamClickHandler (element) {
             socket.emit('clientEvent', element.innerText);
+        }
+
+        function updateDebugParamValues (html) {
+            console.log(html);
+            document.getElementById('debug-test').innerHTML = html;
         }
     </script>
     
     <body>
         <h1>Unemployed & Single</h1>
         <div class="content">
-    		<label>Debug parameters</label>
-    		<table id="debug-params">
-    			<tr>
-        			<th>Name</th>
-        			<th>Value</th>
-      			</tr>
-    		</table>
-    	</div>
-        
+    	    <label>Debug parameters</label>
+    	    <table id="debug-params">
+    	        <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+      	        </tr>
+    	    </table>
+            <div id="debug-test"></div>
+    	</div>        
     </body>
 </html> 
