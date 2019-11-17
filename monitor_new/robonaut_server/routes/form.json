@@ -1,0 +1,24 @@
+{
+  "useSafetyEnableSignal": true,
+  "indicatorLedsEnabled": true,
+  "startSignalEnabled": false,
+  "lineFollowEnabled": true,
+  "motorController_Ti": 484.0000,
+  "motorController_Kc": 1.0000,
+  "frontLineController_P": 2.0000,
+  "frontLineController_D": 0.0000,
+  "rearLineController_P": 1.0000,
+  "rearLineController_D": 1.0000,
+  "car": {
+    "pose": {
+      "pos": {
+        "X": 0.0000,
+        "Y": 0.0000
+      },
+      "angle": 5.5793
+    },
+    "speed": -23.5300
+  },
+  "targetSpeedOverride": 0.0000,
+  "targetSpeedOverrideActive": false
+}
