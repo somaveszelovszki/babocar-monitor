@@ -1,0 +1,13 @@
+root.
+----public
+----src
+ -------components
+    |-------About
+    |-------Carousel
+    |-------Examples
+    |-------Footer
+    |-------Index
+    |-------Menu
+    |-------Status
+ -------resources
+     -------img
