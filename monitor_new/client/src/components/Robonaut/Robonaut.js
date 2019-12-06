@@ -32,6 +32,8 @@ class InputField extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleClickBoolean = this.handleClickBoolean.bind(this);
+    this.handleChangeBoolean = this.handleChangeBoolean.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -49,29 +51,41 @@ class InputField extends React.Component {
 
 	// Input change handler function
 	handleChange(event) {
-    //console.log(event.target)
 		this.setState({ value: event.target.value }) // Update input field state with new value
-		console.log('Input', event.target.name, 'changed to', event.target.value)
+		//console.log('Input', event.target.name, 'changed to', event.target.value)
 		this.props.onInputChange({ key: event.target.name, value: event.target.value }) // Pass value to parent component
   }
   
+  	// Input change handler function
+	handleChangeBoolean(event) {
+    const key = event.target.id
+    //console.log('Change child boolean element: ' + key + ' to ' + event.target.checked)
+		this.props.onInputChange({ key: key, value: event.target.checked }) // Pass value to parent component
+  }
+  
   handleClick(event) {
-    console.log('Clicked on child element: ' + event.target.name + ' ' +event.target.value );
+    //console.log('Clicked on child element: ' + event.target.name + ' ' +event.target.value );
     this.props.onClickParentHandler({ key: event.target.name, value: event.target.value }) // Pass value to parent component
+  }
+
+  handleClickBoolean(event) {
+    //console.log('Clicked on boolean child element: ', event.target.id.split('checkbox-')[1]);
+    this.setState({value: !this.state.value}, () => {console.log(this.state.value)})
   }
 
   render() {
     const name = this.props.name
     var input = null
     if (typeof(this.props.value) !== 'number' && typeof(this.props.value) !== 'string' && (this.props.value == true || this.props.value == false)) {
-      if(this.props.value == true)
+      /*
+      if(this.state.value == true)
       {
         input = (<tr><td colSpan="2"><Form.Check
           custom
           checked
             type="checkbox"
-            id={`default-checkbox`}
-            label={this.props.name}
+            id={'checkbox-' + name}
+            label={name}
           /></td></tr>)
       }
       else
@@ -79,13 +93,22 @@ class InputField extends React.Component {
         input = (<tr><td colSpan="2"><Form.Check
           custom
             type="checkbox"
-            id={`default-checkbox`}
-            label={this.props.name}
+            id={'checkbox-' + name}
+            label={name}
             /></td></tr>)
       }
+      */
+     input = (<tr><td colSpan="2"><Form.Check
+     custom
+     checked={this.props.value}
+       type="checkbox"
+       id={'checkbox-' + name}
+       label={name}
+       onChange={this.handleChangeBoolean}
+       /></td></tr>)
     }
     else {
-      input = <tr><td>{this.props.name}</td><td><input type="text" name={name} value={this.state.value} onChange={this.handleChange} onClick={this.handleClick} onKeyPress={this.handleKeyPress}></input></td></tr>
+      input = <tr><td>{name}</td><td><input type="text" name={name} value={this.state.value} onChange={this.handleChange} onClick={this.handleClick} onKeyPress={this.handleKeyPress}></input></td></tr>
     }
     return input
   }
@@ -157,12 +180,12 @@ export default class Robonaut extends React.Component {
     this.handleEnter = this.handleEnter.bind(this)
   }
   onInputChange = (input) => {
-		console.log('Parent component: onInputChange function', input)
+		//console.log('Parent component: onInputChange function', input)
     let dataCopy = JSON.parse(JSON.stringify(this.state.formData))
-    console.log('this.state.formData', this.state.formData)
-		if (input.hasOwnProperty('value') === true) {
-				console.log('inputData changed to ' + [input.key] + ': ' + input.value)
-				dataCopy[input.key] = input.value
+    if(input.key.includes('checkbox-') === true) {
+      const key = input.key.split('checkbox-')[1]
+      //console.log('Parent boolean change: ' + key + ' to ' + input.value)
+      dataCopy[key] = input.value
 		}
 		else {
 			dataCopy[input.key] = input.value
@@ -184,7 +207,7 @@ export default class Robonaut extends React.Component {
   }
 
   handleClick(e) {
-    console.log("Parent handles child click: set focus to " + e.key)
+    //console.log("Parent handles child click: set focus to " + e.key)
     this.setState({focusedItem: e.key})
   }
 
@@ -192,27 +215,27 @@ export default class Robonaut extends React.Component {
     //console.log("Parent Enter key handling", e)
     if(event.key === 'Enter')
     {
-      console.log("Enter key pressed. Submit form to serial port.")
+      //console.log("Enter key pressed. Submit form to serial port.")
       this.handleSubmit()
     }
   }
 
   handleSubmit() {
-    console.log('handleSubmit')
+    //console.log('handleSubmit')
     var localData = this.state.formData
     for (let [key, value] of Object.entries(this.state.formData)) {
       //console.log({name: key, value: value}, typeof(value))
       if(typeof(value) === 'number')
       {
-        console.log('Number: ', key + ' ' + value)
+        //console.log('Number: ', key + ' ' + value)
         localData[key] = parseFloat(value).toFixed(4)
       }
       else if(typeof(value) === 'string')
       {
-        console.log('String: ', key + ' ' + value)
+        //console.log('String: ', key + ' ' + value)
         if(parseFloat(value) !== NaN)
         {
-          console.log('From: ', key + ' ' + value + ' (' + typeof(value) + ') to ' + key + ' ' + parseFloat(value).toFixed(4) + ' (' + typeof(parseFloat(value)) + ')')
+          //console.log('From: ', key + ' ' + value + ' (' + typeof(value) + ') to ' + key + ' ' + parseFloat(value).toFixed(4) + ' (' + typeof(parseFloat(value)) + ')')
           localData[key] = parseFloat(value).toFixed(4)
         }
       }
