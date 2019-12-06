@@ -138,8 +138,8 @@ port.on('data', function(data) {
   serialData += data;
   if (data.indexOf('$') != -1) {
     timestamp = new Date()
-    console.log(timestamp.toLocaleString() + ': |' + serialData + '|');
-    console.log('Send serial data to client: |' + serialData + '|')
+    console.log('DATA FROM SERIAL PORT |' + serialData + '|' + '\n');
+    //console.log('Send serial data to client: |' + serialData + '|' + '\n\n')
     io.emit("dataFromSerial", serialData.split('$')[0]); // Emitting a new message. It will be consumed by the client
     serialData = '';
   }
@@ -159,7 +159,7 @@ io.on("connection", socket => {
   //interval = setInterval(() => getJsonFile(socket), 3000);
   
   socket.on('dataFromClient', function(data) {
-    console.log('dataFromClient: ' + data)
+    console.log('DATA FROM CLIENT: ' + data + '\n')
     port.write(data)
   });
 });

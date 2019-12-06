@@ -4,6 +4,7 @@ import socketIOClient from "socket.io-client";
 /* Page specific CSS file */
 import './Robonaut.css';
 const socket = socketIOClient("localhost:3001");
+/*
 var jsonTree = []
 
 function readJSON(jsonObject, level) {
@@ -24,6 +25,7 @@ function readJSON(jsonObject, level) {
   }
   return keys
 }
+*/
 
 class InputField extends React.Component {
   constructor(props) {
@@ -136,11 +138,13 @@ class SocketComponent extends React.Component {
   }
 }
 
+/*
 function pad(n, width, z) {
   z = z || '0';
   n = n + '';
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
+*/
 
 /* Page specific name of the component */
 export default class Robonaut extends React.Component {
