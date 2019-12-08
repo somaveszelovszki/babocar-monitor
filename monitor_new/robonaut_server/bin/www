@@ -135,6 +135,7 @@ port.on('error', function(err) {
 });
 
 port.on('data', function(data) {
+  console.log(data.toString().trim())
   serialData += data;
   if (data.indexOf('$') != -1) {
     timestamp = new Date()
