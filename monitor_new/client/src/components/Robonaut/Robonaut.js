@@ -78,7 +78,7 @@ class InputField extends React.Component {
   render() {
     const name = this.props.name
     var input = null
-    if (typeof(this.props.value) !== 'number' && typeof(this.props.value) !== 'string' && (this.props.value == true || this.props.value == false)) {
+    if (typeof(this.props.value) !== 'number' && typeof(this.props.value) !== 'string' && (this.props.value === true || this.props.value === false)) {
       /*
       if(this.state.value == true)
       {
@@ -237,7 +237,7 @@ export default class Robonaut extends React.Component {
       else if(typeof(value) === 'string')
       {
         //console.log('String: ', key + ' ' + value)
-        if(parseFloat(value) !== NaN)
+        if(isNaN(parseFloat(value)) === false)
         {
           //console.log('From: ', key + ' ' + value + ' (' + typeof(value) + ') to ' + key + ' ' + parseFloat(value).toFixed(4) + ' (' + typeof(parseFloat(value)) + ')')
           localData[key] = parseFloat(value).toFixed(4)
@@ -254,24 +254,24 @@ export default class Robonaut extends React.Component {
   }
   render() {
     var renderedElements = null
-    const { serialData, focusedItem } = this.state
-    //console.log(serialData)
+    const { focusedItem } = this.state
     focusedItem && console.log("Current focused on rendering: " + focusedItem)
-    if(this.state.serialData && focusedItem != 'motorController_Ti' && this.state.formData['motorController_Ti'] != this.state.serialData['motorController_Ti'])
+    this.state.serialData && console.log('hey',  focusedItem, this.state.formData['motorController_Ti'], this.state.serialData['motorController_Ti'])
+    if(this.state.serialData && focusedItem !== 'motorController_Ti' && this.state.formData['motorController_Ti'] != this.state.serialData['motorController_Ti'])
     {
       console.log(this.state.formData['motorController_Ti'], this.state.serialData['motorController_Ti'])
       var localJson = this.state.formData
       localJson['motorController_Ti'] = this.state.serialData['motorController_Ti']
       this.setState({formData: localJson, serialData: null})
     }
-    if(this.state.serialData && focusedItem != 'motorController_Kc' && this.state.formData['motorController_Kc'] != this.state.serialData['motorController_Kc'])
+    if(this.state.serialData && focusedItem !== 'motorController_Kc' && this.state.formData['motorController_Kc'] !== this.state.serialData['motorController_Kc'])
     {
       console.log(this.state.formData['motorController_Kc'], this.state.serialData['motorController_Kc'])
       var localJson = this.state.formData
       localJson['motorController_Kc'] = this.state.serialData['motorController_Kc']
       this.setState({formData: localJson, serialData: null})
     }
-    if(this.state.serialData && focusedItem != 'frontLineController_P' && this.state.formData['frontLineController_P'] != this.state.serialData['frontLineController_P'])
+    if(this.state.serialData && focusedItem !== 'frontLineController_P' && this.state.formData['frontLineController_P'] !== this.state.serialData['frontLineController_P'])
     {
       console.log(this.state.formData['frontLineController_P'], this.state.serialData['frontLineController_P'])
       var localJson = this.state.formData
@@ -285,7 +285,7 @@ export default class Robonaut extends React.Component {
         inputElements.push({name: key, value: value})
       }
       renderedElements = inputElements.map(element => {
-        return <InputField name={element.name} value={element.value} onInputChange={this.onInputChange} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+        return <InputField key = {'input-'+element.name} name={element.name} value={element.value} onInputChange={this.onInputChange} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
       })
     }
     else {
