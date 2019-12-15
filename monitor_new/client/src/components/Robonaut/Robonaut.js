@@ -1,152 +1,13 @@
 import React from "react";
-import {Container, Col, Row, Form, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Container, Col, Row, Form, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
 import socketIOClient from "socket.io-client";
-/* Page specific CSS file */
+import InputField from './InputField'
+import SimpleForm from './SimpleForm'
+import { getSimpleObjects, generateTable } from './Recursive'
 import './Robonaut.css';
+
 const socket = socketIOClient("localhost:3001");
-/*
-var jsonTree = []
 
-function readJSON(jsonObject, level) {
-  var keys = []
-  for (let [key, value] of Object.entries(jsonObject)) {
-    var jsonLeaf = []
-    var jsonValue = {}
-    if (typeof value === 'object' && value) {
-      //console.log(`Has children: ${key}: ${value}`);
-      keys.push(readJSON(value, level + 1))
-    }
-    else {
-      console.log(`Level: ${level}: ${key}: ${value}`);
-      var entry = {}
-      entry[key] = value
-      keys.push(entry)
-    }
-  }
-  return keys
-}
-*/
-
-class InputField extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { value: this.props.value };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.handleClickBoolean = this.handleClickBoolean.bind(this);
-    this.handleChangeBoolean = this.handleChangeBoolean.bind(this);
-  }
-
-  componentWillReceiveProps(props) {
-		this.setState({ value: props.value })
-  }
-  
-  handleKeyPress(event) {
-    //console.log("handleKeyPress", event.key)
-    if(event.key === 'Enter')
-    {
-      //console.log("Enter key pressed. Submit form to serial port.")
-      this.props.handleEnter(event)
-    }
-  }
-
-	// Input change handler function
-	handleChange(event) {
-		this.setState({ value: event.target.value }) // Update input field state with new value
-		//console.log('Input', event.target.name, 'changed to', event.target.value)
-		this.props.onInputChange({ key: event.target.name, value: event.target.value }) // Pass value to parent component
-  }
-  
-  	// Input change handler function
-	handleChangeBoolean(event) {
-    const key = event.target.id
-    //console.log('Change child boolean element: ' + key + ' to ' + event.target.checked)
-		this.props.onInputChange({ key: key, value: event.target.checked }) // Pass value to parent component
-  }
-  
-  handleClick(event) {
-    //console.log('Clicked on child element: ' + event.target.name + ' ' +event.target.value );
-    this.props.onClickParentHandler({ key: event.target.name, value: event.target.value }) // Pass value to parent component
-  }
-
-  handleClickBoolean(event) {
-    //console.log('Clicked on boolean child element: ', event.target.id.split('checkbox-')[1]);
-    this.setState({value: !this.state.value}, () => {console.log(this.state.value)})
-  }
-
-  render() {
-    const name = this.props.name
-    var input = null
-    if (typeof(this.props.value) !== 'number' && typeof(this.props.value) !== 'string' && (this.props.value === true || this.props.value === false)) {
-      /*
-      if(this.state.value == true)
-      {
-        input = (<tr><td colSpan="2"><Form.Check
-          custom
-          checked
-            type="checkbox"
-            id={'checkbox-' + name}
-            label={name}
-          /></td></tr>)
-      }
-      else
-      {
-        input = (<tr><td colSpan="2"><Form.Check
-          custom
-            type="checkbox"
-            id={'checkbox-' + name}
-            label={name}
-            /></td></tr>)
-      }
-      */
-     input = (<tr><td colSpan="2"><Form.Check
-     custom
-     checked={this.props.value}
-       type="checkbox"
-       id={'checkbox-' + name}
-       label={name}
-       onChange={this.handleChangeBoolean}
-       /></td></tr>)
-    }
-    else {
-      input = <tr><td>{name}</td><td><input type="text" name={name} value={this.state.value} onChange={this.handleChange} onClick={this.handleClick} onKeyPress={this.handleKeyPress}></input></td></tr>
-    }
-    return input
-  }
-}
-
-class SocketComponent extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      response: null,
-      serialData: null,
-      endpoint: "localhost:3001"
-    };
-  }
-  componentDidMount() {
-  }
-  render() {
-    const { serialData } = this.state;
-    serialData && console.log(Object.keys(JSON.parse(serialData)))
-    return (
-        <div style={{ textAlign: "center" }}>
-          {serialData && serialData}
-        </div>
-    );
-  }
-}
-
-/*
-function pad(n, width, z) {
-  z = z || '0';
-  n = n + '';
-  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-}
-*/
-
-/* Page specific name of the component */
 export default class Robonaut extends React.Component {
   constructor(props) {
     super(props);
@@ -182,7 +43,9 @@ export default class Robonaut extends React.Component {
     this.onInputChange = this.onInputChange.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.handleEnter = this.handleEnter.bind(this)
+    //this.generateTable = this.generateTable.bind(this)
   }
+
   onInputChange = (input) => {
 		//console.log('Parent component: onInputChange function', input)
     let dataCopy = JSON.parse(JSON.stringify(this.state.formData))
@@ -199,7 +62,6 @@ export default class Robonaut extends React.Component {
   componentDidMount() {
     socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data) }));
     socket.on("dataFromJSON", data => this.setState({ response: data }));
-
     /*
     fetch('/form')
       .then(response => response.json())
@@ -253,6 +115,7 @@ export default class Robonaut extends React.Component {
     socket.emit('dataFromClient', JSON.stringify(localData))
   }
   render() {
+    var recursiveTable = generateTable(this.state.formData)
     var renderedElements = null
     const { focusedItem } = this.state
     focusedItem && console.log("Current focused on rendering: " + focusedItem)
@@ -294,9 +157,9 @@ export default class Robonaut extends React.Component {
     return (
       <div>
         <Container fluid>
-          <Row>
+        <Row>
             <Col>
-            <SocketComponent />
+            <SimpleForm socket = {socket} />
             </Col>
           </Row>
           <Row>
@@ -314,6 +177,11 @@ export default class Robonaut extends React.Component {
                 </tr>
               </tbody>
             </Table>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+            {recursiveTable && recursiveTable}
             </Col>
           </Row>
         </Container>
