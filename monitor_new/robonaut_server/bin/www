@@ -170,7 +170,7 @@ io.on("connection", socket => {
     console.log("Client disconnected");
   });
   
-  interval = setInterval(() => port.write('123456hshshshsh7890123456789012345678901234567890123456789aghshjdjdjd'), 1000);
+  //interval = setInterval(() => port.write('123456hshshshsh7890123456789012345678901234567890123456789aghshjdjdjd'), 1000);
   
   socket.on('dataFromClient', function(data) {
     console.log('DATA FROM CLIENT: ' + data + '\n')
