@@ -3,19 +3,13 @@ import { Navbar, Container, Col, Row, Form, Table, Button, Tabs, Tab } from "rea
 import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
-import { getSimpleObjects, generateTable } from './Recursive'
+import { generateTable } from './Recursive'
 import LogViewer from './LogViewer'
 import './Robonaut.css';
 import logo from '../../resources/img/logo.png'
-import logoInverted from '../../resources/img/logoInverted.png'
-import JSONTree from 'react-json-tree'
+import mapIcon from '../../resources/img/map.png'
 import {
   JsonTree,
-  ADD_DELTA_TYPE,
-  REMOVE_DELTA_TYPE,
-  UPDATE_DELTA_TYPE,
-  DATA_TYPES,
-  INPUT_USAGE_TYPES,
 } from 'react-editable-json-tree'
 
 const socket = socketIOClient("localhost:3001");
@@ -135,7 +129,7 @@ export default class Robonaut extends React.Component {
     socket.emit('dataFromClient', JSON.stringify(localData))
   }
   render() {
-    var recursiveTable = generateTable(this.state.formData)
+    var recursiveTable = generateTable(this.state.formData, this.onInputChange)
     var renderedElements = null
     const { focusedItem } = this.state
     focusedItem && console.log("Current focused on rendering: " + focusedItem)
@@ -177,7 +171,7 @@ export default class Robonaut extends React.Component {
     return (
       <div>
         <Container fluid>
-        <Navbar bg="light" variant="light" style = {{textAlign: 'center'}}>
+        <Navbar bg="light" variant="light" style = {{textAlign: 'center', marginBottom: '5px'}}>
         <Navbar.Brand href="#home">
           <img
             alt=""
@@ -198,7 +192,7 @@ export default class Robonaut extends React.Component {
                 <SimpleForm socket = {socket} />
               </Tab>
               <Tab eventKey="map" title="Map" style = {TabStyle}>
-                The Map feature will be avaliable here.
+              <img src = {mapIcon} /> The Map feature will be avaliable here.
               </Tab>
               <Tab eventKey="tree" title="Tree" style = {TabStyle}>
               <JsonTree data={this.state.formData} />

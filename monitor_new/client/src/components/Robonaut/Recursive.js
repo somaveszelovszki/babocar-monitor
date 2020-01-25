@@ -1,5 +1,6 @@
 import React from "react";
-import { Form } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Table } from "react-bootstrap";
+import InputField from './InputField'
 
 export function getSimpleObjects(obj, level)
 {
@@ -32,7 +33,20 @@ export function getSimpleObjects(obj, level)
   return simpleObjects
 }
 
-export function generateTable(data)
+function getChildren(object)
+{
+  console.log('getChildren', object)
+  let childrenArray = []
+  if(object.hasOwnProperty('children'))
+  {
+    console.log('children:', object['children']);
+  }
+  else {
+    
+  }
+}
+
+export function generateTable(data, inputChangeHandler)
 {
   let table = []
   let children = []
@@ -52,7 +66,9 @@ export function generateTable(data)
           }
           else
           {
-            table.push(<tr><td>{object['key']}</td><td>{object['value']}</td></tr>)
+            let input = <InputField key = {'input-'+object['key']} name={object['key']} value={object['value']} onInputChange={inputChangeHandler} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+            //table.push(<tr><td>{object['key']}</td><td>{object['value']}</td></tr>)
+            table.push(input)
           }
         }
         else {
@@ -61,17 +77,50 @@ export function generateTable(data)
           let children = object['children'].map(child => {
             if(child.hasOwnProperty('children') === false)
             {
-              return <tr><td>{child['key']}</td><td>{child['value']}</td></tr>
+              let input = <InputField key = {'input-'+child['key']} name={child['key']} value={child['value']} onInputChange={inputChangeHandler} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+              return <tr><td>{child['key']}</td><td>{input}</td></tr>
+              //return <tr><td>{child['key']}</td><td>{child['value']}</td></tr>
             }
             else {
-              
+              //getChildren(child)
+              console.log('children', child['children']);
+              return <tr><td>{child['parent']}</td><td>{child['children'].map(child => {
+                console.log('child', child);
+                if(child.hasOwnProperty('children') === false)
+                {
+                  console.log('child has no more children');
+                  let input = <InputField key = {'input-'+child['key']} name={child['key']} value={child['value']} onInputChange={inputChangeHandler} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+                  return input
+                  //return <tr><td>{child['key']}</td><td>{child['value']}</td></tr>
+                }
+                else {
+                  //getChildren(child)
+                  console.log('children', child['children']);
+                  return <tr><td>{child['parent']}</td><td>{child['children'].map(child => {
+                    console.log('child', child);
+                    if(child.hasOwnProperty('children') === false)
+                    {
+                      console.log('child has no more children', child);
+                      let input = <InputField key = {'input-'+child['key']} name={child['key']} value={child['value']} onInputChange={inputChangeHandler} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+                      return input
+                    }
+                    else {
+                      //getChildren(child)
+                      console.log('children', child['children']);
+                      child['children'].map(child => {
+                        console.log('child', child);
+                      })
+                    } 
+                  })}</td></tr>
+                } 
+              })}</td></tr>
             }
           })
           table.push(<tr>{parent}{children}</tr>)
         }
       })
     }
-    return <table>{table}</table>
+    return <Table striped bordered hover>{table}</Table>
   }
   else
   {
