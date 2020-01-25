@@ -3,19 +3,76 @@ import { Accordion, Card, ListGroup, Button } from "react-bootstrap"; // Necessa
 import socketIOClient from "socket.io-client";
 import './Robonaut.css';
 
+const maxLength = 200
+
+const ListStyle = {
+  maxHeight: '800px',
+  marginBottom: '10px',
+  overflow: 'scroll'
+}
+
 export default class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      logs: ['log1', 'log2', 'log3']
+      numLogs: 0,
+      logs: ['[D] Log message 1', '[E] Log message 2', '[W] Log message 3', '[I] Log message 4', '[D]  Log message 5', '[E] Log message 6', '[W] Log message 7', '[I] Log message 8']
     }
   }
+  getColor(type)
+  {
+    let variant
+    if(type === '[E]')
+    {
+      variant = "danger"
+    }
+    else if(type === '[W]')
+    {
+      variant = "warning"
+    }
+    else if(type === '[I]')
+    {
+      variant = "info"
+    }
+    else if(type === '[D]')
+    {
+      variant = "dark"
+    }
+    else
+    {
+      variant = null
+    }
+    return variant
+  }
+  addElement()
+  {
+    var newArray = this.state.logs;
+    newArray.unshift('Log message ' + (this.state.logs.length+1));
+    if(this.state.logs.length > maxLength)
+    {
+      newArray.pop()
+    }
+    this.setState({ logs: newArray });
+  }
   componentDidMount() {
+    // log scroll
+    // színekkel
+    // prio
+    // E - danger
+    // W - warning
+    // I - info
+    // D - dark
+    // remove letter becasue of the colors
+    // ring buffer: 200
     console.log('LogViewer has mounted.');
     this.props.socket.on("logFromSerial", data => {
       console.log('logFromSerial', data);
       var newArray = this.state.logs;
       newArray.unshift(data);
+      if(this.state.logs.length > maxLength)
+      {
+        newArray.pop()
+      }
       this.setState({ logs: newArray });
       /*
         console.log(JSON.parse(data));
@@ -26,8 +83,11 @@ export default class LogViewer extends React.Component {
     });
   }
   render() {
-      var logListItems = this.state.logs.map(log => {
-          return <ListGroup.Item>{log}</ListGroup.Item>
+      var logListItems = this.state.logs.map((log, index) => {
+          let messageType = log.substring(0, 3)
+          let variant = this.getColor(messageType)
+          log = log.substring(3)
+          return <ListGroup.Item variant={variant}>Log #{index+1}: {log}</ListGroup.Item>
       })
     return (
         <div>
@@ -38,14 +98,15 @@ export default class LogViewer extends React.Component {
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey="0">
                 <Card.Body>
-                    <ListGroup>
+                    <Button variant="danger" style = {{marginBottom: '5px'}} onClick = {() => {this.setState({logs: []})}}>Reset</Button>
+                    <Button variant="success" style = {{marginBottom: '5px', marginLeft: '5px'}} onClick = {() => {this.addElement()}}>Insert</Button>
+                    <ListGroup style = {ListStyle}>
                         {this.state.logs.length > 0 ? logListItems : "There are no logs."}
                     </ListGroup>
                 </Card.Body>
                 </Accordion.Collapse>
             </Card>
         </Accordion>
-        <Button variant="danger" style = {{marginTop: '5px'}} onClick = {() => {this.setState({logs: []})}}>Reset</Button>
         </div>
     )
   }
