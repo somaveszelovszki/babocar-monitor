@@ -60,9 +60,19 @@ export default class Robonaut extends React.Component {
     //this.generateTable = this.generateTable.bind(this)
   }
 
+  findKeyInJson(input)
+  {
+    console.log('findKeyInJson', input);
+    
+  }
+
   onInputChange = (input) => {
-		//console.log('Parent component: onInputChange function', input)
+		console.log('Parent component: onInputChange function', input)
     let dataCopy = JSON.parse(JSON.stringify(this.state.formData))
+    if(dataCopy.hasOwnProperty(input.key) === false)
+    {
+      this.findKeyInJson(input)
+    }
     if(input.key.includes('checkbox-') === true) {
       const key = input.key.split('checkbox-')[1]
       //console.log('Parent boolean change: ' + key + ' to ' + input.value)
@@ -129,7 +139,7 @@ export default class Robonaut extends React.Component {
     socket.emit('dataFromClient', JSON.stringify(localData))
   }
   render() {
-    var recursiveTable = generateTable(this.state.formData, this.onInputChange)
+    var recursiveTable = generateTable(this.state.formData, this.onInputChange, this.handleEnter, this.handleClick)
     var renderedElements = null
     const { focusedItem } = this.state
     focusedItem && console.log("Current focused on rendering: " + focusedItem)

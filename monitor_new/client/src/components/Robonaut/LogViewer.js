@@ -3,7 +3,7 @@ import { Accordion, Card, ListGroup, Button } from "react-bootstrap"; // Necessa
 import socketIOClient from "socket.io-client";
 import './Robonaut.css';
 
-export default class Robonaut extends React.Component {
+export default class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -11,6 +11,7 @@ export default class Robonaut extends React.Component {
     }
   }
   componentDidMount() {
+    console.log('LogViewer has mounted.');
     this.props.socket.on("logFromSerial", data => {
         console.log(JSON.parse(data));
         var newArray = this.state.logs;
