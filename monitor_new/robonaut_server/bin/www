@@ -154,7 +154,7 @@ port.on('data', function(data) {
     else {
       io.emit("dataFromSerial", serialData.split('$')[0]); // Emitting a new message. It will be consumed by the client
     }
-    console.log('Serial data: ' + serialData.split('$')[0])
+    //console.log('Serial data: ' + serialData.split('$')[0])
     serialData = '';
   }
 });
@@ -170,7 +170,7 @@ io.on("connection", socket => {
     console.log("Client disconnected");
   });
   
-  //interval = setInterval(() => getJsonFile(socket), 3000);
+  interval = setInterval(() => port.write('123456hshshshsh7890123456789012345678901234567890123456789aghshjdjdjd'), 1000);
   
   socket.on('dataFromClient', function(data) {
     console.log('DATA FROM CLIENT: ' + data + '\n')
