@@ -14,6 +14,9 @@ export default class LogViewer extends React.Component {
     console.log('LogViewer has mounted.');
     this.props.socket.on("logFromSerial", data => {
       console.log('logFromSerial', data);
+      var newArray = this.state.logs;
+      newArray.unshift(data);
+      this.setState({ logs: newArray });
       /*
         console.log(JSON.parse(data));
         var newArray = this.state.logs;
