@@ -10,8 +10,6 @@ export default class SimpleFrom extends React.Component {
       this.state = {
         focusedItem: null,
         formData: {
-          "motorController_Ti": .3,
-          "motorController_Kc": 1.0000,
           "frontLineController_P": 2.0000,
           "frontLineController_D": 0.0000,
           "rearLineController_P": 1.0000,
