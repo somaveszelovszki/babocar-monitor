@@ -136,7 +136,7 @@ export default class Robonaut extends React.Component {
       }
     }
     console.log('localData', localData)
-    socket.emit('dataFromClient', JSON.stringify(localData))
+    socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
   }
   render() {
     var recursiveTable = generateTable(this.state.formData, this.onInputChange, this.handleEnter, this.handleClick)
