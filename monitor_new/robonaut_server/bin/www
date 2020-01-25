@@ -94,7 +94,7 @@ function onListening() {
 
 const io = socketIo(server)
 
-const serialPortNumber = 'COM29'
+const serialPortNumber = '/dev/ttyAMA0'
 
 // var port = new SerialPort('/dev/serial0', {
 var port = new SerialPort(serialPortNumber, {
@@ -147,8 +147,13 @@ port.on('data', function(data) {
   if (data.indexOf('$') != -1) {
     timestamp = new Date()
     console.log('DATA FROM SERIAL PORT |' + serialData + '|' + '\n');
-    //console.log('Send serial data to client: |' + serialData + '|' + '\n\n')
-    io.emit("dataFromSerial", serialData.split('$')[0]); // Emitting a new message. It will be consumed by the client
+    //console.log('Send serial data to client: |' + serialData + '|' + '\n\n')    
+    if(serialData.includes('[P]') === false) {
+      io.emit('logFromSerial', serialData.split('$')[0])
+    }
+    else {
+      io.emit("dataFromSerial", serialData.split('$')[0]); // Emitting a new message. It will be consumed by the client
+    }
     serialData = '';
   }
 });
