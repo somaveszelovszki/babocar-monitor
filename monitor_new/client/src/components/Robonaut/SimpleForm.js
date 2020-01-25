@@ -10,10 +10,10 @@ export default class SimpleFrom extends React.Component {
       this.state = {
         focusedItem: null,
         formData: {
-          "frontLineController_P": 2.0000,
-          "frontLineController_D": 0.0000,
-          "rearLineController_P": 1.0000,
-          "rearLineController_D": 1.0000
+          "frontLineCtrl_P_slow": 2.0000,
+          "frontLineCtrl_D_slow": 0.0000,
+          "rearLineCtrl_P_slow": 1.0000,
+          "rearLineCtrl_D_slow": 1.0000
         }
       }
       this.handleSubmit = this.handleSubmit.bind(this)
