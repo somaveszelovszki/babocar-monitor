@@ -80,7 +80,7 @@ export default class SimpleFrom extends React.Component {
         }
       }
       console.log('localData', localData)
-      this.props.socket.emit('dataFromClient', JSON.stringify(localData))
+      this.props.socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
     }
     render() {
       var renderedElements = null
