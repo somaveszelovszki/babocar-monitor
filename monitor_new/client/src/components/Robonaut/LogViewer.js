@@ -53,6 +53,7 @@ export default class LogViewer extends React.Component {
       newArray.pop()
     }
     this.setState({ logs: newArray });
+    // <Button variant="success" style = {{marginBottom: '5px', marginLeft: '5px'}} onClick = {() => {this.addElement()}}>Insert</Button>
   }
   componentDidMount() {
     // log scroll
@@ -99,7 +100,6 @@ export default class LogViewer extends React.Component {
                 <Accordion.Collapse eventKey="0">
                 <Card.Body>
                     <Button variant="danger" style = {{marginBottom: '5px'}} onClick = {() => {this.setState({logs: []})}}>Reset</Button>
-                    <Button variant="success" style = {{marginBottom: '5px', marginLeft: '5px'}} onClick = {() => {this.addElement()}}>Insert</Button>
                     <ListGroup style = {ListStyle}>
                         {this.state.logs.length > 0 ? logListItems : "There are no logs."}
                     </ListGroup>
