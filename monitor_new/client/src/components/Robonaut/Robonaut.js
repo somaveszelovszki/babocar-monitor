@@ -12,7 +12,7 @@ import {
   JsonTree,
 } from 'react-editable-json-tree'
 
-const socket = socketIOClient("localhost:3001");
+const socket = socketIOClient("192.168.137.66:3001");
 
 const TabStyle = {
   border: '1px solid rgba(0, 0, 0, .125)',
