@@ -205,7 +205,7 @@ export default class Robonaut extends React.Component {
               <img src = {mapIcon} /> The Map feature will be avaliable here.
               </Tab>
               <Tab eventKey="tree" title="Tree" style = {TabStyle}>
-              <JsonTree data={this.state.formData} />
+              <JsonTree data={this.state.serialData} />
               </Tab>
             </Tabs>          
             </Col>
