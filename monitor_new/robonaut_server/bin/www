@@ -132,6 +132,13 @@ const getJsonFile = async socket => {
 // open errors will be emitted as an error event 
 port.on('error', function(err) {
   console.log('Error: ', err.message);
+  if(err.message.includes('busy') === true || err.message.includes('no device') === true)
+  {
+    SerialPort.list().then( ports => {
+      ports.forEach(console.log)
+      err => console.log('serialport error event: ' + err)
+    })
+  }
 });
 
 port.on('data', function(data) {

@@ -1,12 +1,32 @@
 import React from "react";
-import { Container, Col, Row, Form, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Navbar, Container, Col, Row, Form, Table, Button, Tabs, Tab } from "react-bootstrap"; // Necessary react-bootstrap components
 import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
 import { getSimpleObjects, generateTable } from './Recursive'
+import LogViewer from './LogViewer'
 import './Robonaut.css';
+import logo from '../../resources/img/logo.png'
+import logoInverted from '../../resources/img/logoInverted.png'
+import JSONTree from 'react-json-tree'
+import {
+  JsonTree,
+  ADD_DELTA_TYPE,
+  REMOVE_DELTA_TYPE,
+  UPDATE_DELTA_TYPE,
+  DATA_TYPES,
+  INPUT_USAGE_TYPES,
+} from 'react-editable-json-tree'
 
 const socket = socketIOClient("localhost:3001");
+
+const TabStyle = {
+  border: '1px solid rgba(0, 0, 0, .125)',
+  borderBottomRightRadius: '.25rem',
+  borderBottomLeftRadius: '.25rem',
+  padding: '15px',
+  marginBottom: '5px'
+}
 
 export default class Robonaut extends React.Component {
   constructor(props) {
@@ -61,7 +81,7 @@ export default class Robonaut extends React.Component {
 	}
   componentDidMount() {
     socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data) }));
-    socket.on("dataFromJSON", data => this.setState({ response: data }));
+    socket.on("dataFromJSON", data => this.setState({ response: data })); 
     /*
     fetch('/form')
       .then(response => response.json())
@@ -157,9 +177,36 @@ export default class Robonaut extends React.Component {
     return (
       <div>
         <Container fluid>
+        <Navbar bg="light" variant="light" style = {{textAlign: 'center'}}>
+        <Navbar.Brand href="#home">
+          <img
+            alt=""
+            src={logo}
+            width="75"
+            height="75"
+            className="d-inline-block align-top"
+          />{' '}
+        </Navbar.Brand>
+        <div style = {{color: 'black'}}>
+          Unemployed &amp; Single
+          </div>
+      </Navbar>
         <Row>
-            <Col>
-            <SimpleForm socket = {socket} />
+            <Col sm={4}>
+            <Tabs defaultActiveKey="simpleform" id="uncontrolled-tab-example">
+              <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
+                <SimpleForm socket = {socket} />
+              </Tab>
+              <Tab eventKey="map" title="Map" style = {TabStyle}>
+                The Map feature will be avaliable here.
+              </Tab>
+              <Tab eventKey="tree" title="Tree" style = {TabStyle}>
+              <JsonTree data={this.state.formData} />
+              </Tab>
+            </Tabs>          
+            </Col>
+            <Col sm={8}>
+              <LogViewer socket = {socket} />
             </Col>
           </Row>
           <Row>
