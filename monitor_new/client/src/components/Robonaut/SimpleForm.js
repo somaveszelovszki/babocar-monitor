@@ -1,7 +1,6 @@
 import React from "react";
-import { Container, Col, Row, Form, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Col, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
 import InputField from './InputField'
-import SimpleForm from './SimpleForm'
 import './Robonaut.css';
 
 export default class SimpleFrom extends React.Component {
@@ -85,32 +84,33 @@ export default class SimpleFrom extends React.Component {
     render() {
       var renderedElements = null
       const { focusedItem } = this.state
+      var localJson = null
       focusedItem && console.log("Current focused on rendering: " + focusedItem)
       if(this.state.serialData && focusedItem !== 'frontLineController_P' && this.state.formData['frontLineController_P'] != this.state.serialData['frontLineController_P'])
       {
         console.log(this.state.formData['frontLineController_P'], this.state.serialData['frontLineController_P'])
-        var localJson = this.state.formData
+        localJson = this.state.formData
         localJson['frontLineController_P'] = this.state.serialData['frontLineController_P']
         this.setState({formData: localJson, serialData: null})
       }
       if(this.state.serialData && focusedItem !== 'frontLineController_D' && this.state.formData['frontLineController_D'] !== this.state.serialData['frontLineController_D'])
       {
         console.log(this.state.formData['frontLineController_D'], this.state.serialData['frontLineController_D'])
-        var localJson = this.state.formData
+        localJson = this.state.formData
         localJson['frontLineController_D'] = this.state.serialData['frontLineController_D']
         this.setState({formData: localJson, serialData: null})
       }
       if(this.state.serialData && focusedItem !== 'rearLineController_P' && this.state.formData['rearLineController_P'] !== this.state.serialData['rearLineController_P'])
       {
         console.log(this.state.formData['rearLineController_P'], this.state.serialData['rearLineController_P'])
-        var localJson = this.state.formData
+        localJson = this.state.formData
         localJson['rearLineController_P'] = this.state.serialData['rearLineController_P']
         this.setState({formData: localJson, serialData: null})
       }
       if(this.state.serialData && focusedItem !== 'rearLineController_D' && this.state.formData['rearLineController_D'] !== this.state.serialData['rearLineController_D'])
       {
         console.log(this.state.formData['rearLineController_D'], this.state.serialData['rearLineController_D'])
-        var localJson = this.state.formData
+        localJson = this.state.formData
         localJson['rearLineController_D'] = this.state.serialData['rearLineController_D']
         this.setState({formData: localJson, serialData: null})
       }
