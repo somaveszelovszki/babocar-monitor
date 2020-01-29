@@ -33,23 +33,11 @@ export function getSimpleObjects(obj, level)
   return simpleObjects
 }
 
-function getChildren(object)
-{
-  //console.log('getChildren', object)
-  let childrenArray = []
-  if(object.hasOwnProperty('children'))
-  {
-    //console.log('children:', object['children']);
-  }
-  else {
-    
-  }
-}
-
 export function generateTable(data, inputChangeHandler, handleEnter, onClickParentHandler)
 {
+  console.log('generateTable', data);
+  
   let table = []
-  let children = []
   if(typeof data === 'object')
   {
     let simpleObjects = getSimpleObjects(data, 1)
@@ -107,8 +95,9 @@ export function generateTable(data, inputChangeHandler, handleEnter, onClickPare
                     else {
                       //getChildren(child)
                       //console.log('children', child['children']);
-                      child['children'].map(child => {
+                      return child['children'].map(child => {
                         //console.log('child', child);
+                        return null
                       })
                     } 
                   })}</td></tr>
