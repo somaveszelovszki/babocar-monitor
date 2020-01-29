@@ -1,6 +1,5 @@
 import React from "react";
 import { Accordion, Card, ListGroup, Button } from "react-bootstrap"; // Necessary react-bootstrap components
-import socketIOClient from "socket.io-client";
 import './Robonaut.css';
 
 const maxLength = 200
@@ -56,16 +55,6 @@ export default class LogViewer extends React.Component {
     // <Button variant="success" style = {{marginBottom: '5px', marginLeft: '5px'}} onClick = {() => {this.addElement()}}>Insert</Button>
   }
   componentDidMount() {
-    // log scroll
-    // színekkel
-    // prio
-    // E - danger
-    // W - warning
-    // I - info
-    // D - dark
-    // remove letter becasue of the colors
-    // ring buffer: 200
-    console.log('LogViewer has mounted.');
     this.props.socket.on("logFromSerial", data => {
       console.log('logFromSerial', data);
       var newArray = this.state.logs;
@@ -80,7 +69,7 @@ export default class LogViewer extends React.Component {
         var newArray = this.state.logs;
         newArray.push(JSON.parse(data));
         this.setState({ logs: newArray });
-        */
+      */
     });
   }
   render() {
@@ -88,14 +77,14 @@ export default class LogViewer extends React.Component {
           let messageType = log.substring(0, 3)
           let variant = this.getColor(messageType)
           log = log.substring(3)
-          return <ListGroup.Item variant={variant}>Log #{index+1}: {log}</ListGroup.Item>
+          return <ListGroup.Item key={'log-item-'+index} variant={variant}>Log #{index+1}: {log}</ListGroup.Item>
       })
     return (
         <div>
         <Accordion defaultActiveKey="0" style = {{borderBottom: '1px solid rgba(0, 0, 0, .125)'}}>
             <Card>
                 <Accordion.Toggle as={Card.Header} eventKey="0">
-                    Logs
+                    Logs {this.state.logs.length > 0 && `(Number of logs: ${this.state.logs.length})`}
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey="0">
                 <Card.Body>
