@@ -12,7 +12,7 @@ import {
   JsonTree,
 } from 'react-editable-json-tree'
 
-const socket = socketIOClient("192.168.137.66:3001");
+const socket = socketIOClient("10.42.0.39:3001");
 
 var counter = 1
 
