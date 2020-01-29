@@ -13,11 +13,23 @@ export default class InputField extends React.Component {
       this.handleClickBoolean = this.handleClickBoolean.bind(this);
       this.handleChangeBoolean = this.handleChangeBoolean.bind(this);
     }
-  
+    /*
     componentWillReceiveProps(props) {
+    //componentWillReceiveProps(props) {
           this.setState({ value: props.value })
     }
-    
+    */
+   componentDidUpdate(prevProps)
+   {
+     //console.log('componentDidUpdate', prevProps, prevProps.value, this.props.value);
+      if(prevProps.value != this.props.value)
+      {
+          this.setState({        
+            value: this.props.value
+          });
+      }
+  }
+
     handleKeyPress(event) {
       //console.log("handleKeyPress", event.key)
       if(event.key === 'Enter')
