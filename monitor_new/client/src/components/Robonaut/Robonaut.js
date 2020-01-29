@@ -234,9 +234,8 @@ export default class Robonaut extends React.Component {
     */
 	}
   componentDidMount() {
-    socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data) }));
+    socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data), formData: JSON.parse(data) }));
     socket.on("dataFromJSON", data => this.setState({ response: data })); 
-    this.editJSON()
     /*
     fetch('/form')
       .then(response => response.json())
