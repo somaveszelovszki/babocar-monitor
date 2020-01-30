@@ -15,7 +15,7 @@ export default class LogViewer extends React.Component {
     super(props);
     this.state = {
       numLogs: 0,
-      logs: ['[D] Log message 1', '[E] Log message 2', '[W] Log message 3', '[I] Log message 4', '[D]  Log message 5', '[E] Log message 6', '[W] Log message 7', '[I] Log message 8']
+      logs: []
     }
   }
   getColor(type)
@@ -77,14 +77,14 @@ export default class LogViewer extends React.Component {
           let messageType = log.substring(0, 3)
           let variant = this.getColor(messageType)
           log = log.substring(3)
-          return <ListGroup.Item key={'log-item-'+index} variant={variant}>Log #{index+1}: {log}</ListGroup.Item>
+          return <ListGroup.Item key={'log-item-'+index} variant={variant}>{log}</ListGroup.Item>
       })
     return (
         <div>
         <Accordion defaultActiveKey="0" style = {{borderBottom: '1px solid rgba(0, 0, 0, .125)'}}>
             <Card>
                 <Accordion.Toggle as={Card.Header} eventKey="0">
-                    Logs {this.state.logs.length > 0 && `(Number of logs: ${this.state.logs.length})`}
+                    Logs {this.state.logs.length > 0 ? `(Number of logs: ${this.state.logs.length})` : `(Empty)`}
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey="0">
                 <Card.Body>
