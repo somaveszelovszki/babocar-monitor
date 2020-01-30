@@ -63,6 +63,7 @@ export default class Robonaut extends React.Component {
     this.updateValue = this.updateValue.bind(this)
     this.searchKey = this.searchKey.bind(this)
     this.editJSON = this.editJSON.bind(this)
+    this.updateFormData = this.updateFormData.bind(this)
     //this.generateTable = this.generateTable.bind(this)
   }
 
@@ -232,9 +233,36 @@ export default class Robonaut extends React.Component {
 		}
     this.setState({ formData: dataCopy })
     */
-	}
+  }
+  
+  updateFormData()
+  {
+    const { focusedItem } = this.state
+    console.log(`updateFormData: `, focusedItem);
+    if(typeof(serialData) !== 'object')
+    {
+      // error handling?
+    }
+    if(serialData)
+    {
+      var originalMsg = JSON.stringify(serialData);
+      const lockedItem = this.state.focusedItem
+      const modifedKeyValuePair = '"' + lockedItem.key + '":' + lockedItem.value.toString()
+      const pattern = '"' + lockedItem.key + '":[+-]?[0-9]+[.]?[0-9]?'
+      let re = new RegExp(pattern)
+      console.log('serialData', originalMsg)
+      console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
+      var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
+      console.log('updatedMsg', updatedMsg)
+      var newObj = JSON.parse(updatedMsg); 
+      console.log('newObj', newObj);
+      this.setState({ serialData: JSON.parse(originalMsg), formData: JSON.parse(newObj) })
+    }
+  }
+
   componentDidMount() {
-    socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data), formData: JSON.parse(data) }));
+    socket.on("dataFromSerial", data => this.updateFormData(data));
     socket.on("dataFromJSON", data => this.setState({ response: data })); 
     /*
     fetch('/form')
@@ -247,8 +275,8 @@ export default class Robonaut extends React.Component {
   }
 
   handleClick(e) {
-    //console.log("Parent handles child click: set focus to " + e.key)
-    this.setState({focusedItem: e.key})
+    console.log("Parent handles child click: set focus to ", e)
+    this.setState({focusedItem: e})
   }
 
   handleEnter(event) {
@@ -285,7 +313,7 @@ export default class Robonaut extends React.Component {
         //console.log(parseFloat(value.toFixed(4)))
       }
     }
-    console.log('localData', localData)
+    console.log('Sending data to serial: ', localData)
     socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
   }
 
@@ -414,7 +442,8 @@ export default class Robonaut extends React.Component {
     var renderedElements = null
     const { focusedItem } = this.state
     var localJson = null
-    focusedItem && console.log("Current focused on rendering: " + focusedItem)
+    focusedItem && console.log("Current focused on rendering: ", focusedItem)
+    /*
     this.state.serialData && console.log('hey',  focusedItem, this.state.formData['motorController_Ti'], this.state.serialData['motorController_Ti'])
     if(this.state.serialData && focusedItem !== 'motorController_Ti' && this.state.formData['motorController_Ti'] != this.state.serialData['motorController_Ti'])
     {
@@ -437,6 +466,7 @@ export default class Robonaut extends React.Component {
       localJson['frontLineController_P'] = this.state.serialData['frontLineController_P']
       this.setState({formData: localJson, serialData: null})
     }
+    */
     //console.log('formData', this.state.formData)
     if(this.state.formData) {
       var inputElements = []
