@@ -326,13 +326,23 @@ export default class Robonaut extends React.Component {
     if(jsonData)
     {
       var originalMsg = JSON.stringify(jsonData);
-      const modifiedKey = key
-      const modifiedValue = value
-      const modifedKeyValuePair = '"' + modifiedKey + '":' + modifiedValue.toString()
-      const pattern = '"' + modifiedKey + '":[+-]?[0-9]+[.]?[0-9]?'
+      var modifiedKey = key
+      var modifiedValue = value
+      if(key.includes('checkbox-') === true)
+      {
+        console.log(`This is a checkbox: ${key}`);
+        modifiedKey = key.split('checkbox-')[1]
+      }
+      var modifedKeyValuePair = '"' + modifiedKey + '":' + modifiedValue.toString()
+      var pattern = '"' + modifiedKey + '":[+-]?[0-9]+[.]?[0-9]?'
+      if(key.includes('checkbox-') === true)
+      {
+        pattern = '"' + modifiedKey + '":(true|false)'
+        console.log(`This is a checkbox pattern: ${pattern}`);
+      }
       let re = new RegExp(pattern)
       console.log('originalMsg', originalMsg)
-      console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      console.log(`Pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
       console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
       var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
       console.log('updatedMsg', updatedMsg)
@@ -361,7 +371,7 @@ export default class Robonaut extends React.Component {
           //console.log(object['key'] + ' has no children, value type: '  + typeof object['value'])
           if(typeof object['value'] == 'boolean')
           {
-            table.push(<tr key = {'table-'+object['key']}><td>{object['key']}</td><td>{object['value'] === true ? 'true' : 'false'}</td></tr>)
+            table.push(<tr key = {'table-'+object['key']}><td>{object['key']}</td><InputField key = {'input-'+object['parent']+object['key']} name={object['key']} value={object['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField></tr>)
           }
           else
           {
@@ -399,7 +409,6 @@ export default class Robonaut extends React.Component {
                     //console.log('child', child);
                     if(child.hasOwnProperty('children') === false)
                     {
-                      //console.log('child has no more children', child);
                       var input = <InputField key = {'input-'+object['parent']+child['key']} name={child['key']} value={child['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
                       return input
                     }
