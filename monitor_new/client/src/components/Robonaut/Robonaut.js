@@ -510,6 +510,13 @@ export default class Robonaut extends React.Component {
             <Col sm={6}>
             <Tabs defaultActiveKey="simpleform" id="uncontrolled-tab-example">
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
+                <SimpleForm socket = {socket} />
+                {this.state.serialData && <JsonTree data={this.state.serialData} />}
+              </Tab>
+              <Tab eventKey="serialviewer" title="Serial data tree viewer" style = {TabStyle}>
+                {this.state.serialData && <JsonTree data={this.state.serialData} />}
+              </Tab>
+              <Tab eventKey="genericform" title="Generic form" style = {TabStyle}>
                 {recursiveTable && recursiveTable}
               </Tab>
               <Tab eventKey="map" title="Map" style = {TabStyle}>
