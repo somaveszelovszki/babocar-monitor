@@ -267,8 +267,7 @@ export default class Robonaut extends React.Component {
   }
 
   componentDidMount() {
-    // dataFromSerial
-    socket.on("dataFromJSON", data => {
+    socket.on("dataFromSerial", data => {
       //console.log('dataFromJSON', data );
       const updatedData = this.updateFormData(data);
       const newCoordinate = { x: Math.floor(data['car']['pose']['pos_m']['X']), y: Math.floor(data['car']['pose']['pos_m']['Y']) }
@@ -293,7 +292,7 @@ export default class Robonaut extends React.Component {
       }
     });
     // dataFromJSON
-    socket.on("dataFromSerial", data => { console.log('dataFromSerial', data );
+    socket.on("dataFromJSON", data => { console.log('dataFromJSON', data );
     this.updateFormData(data); this.setState({ serialData: data }) });
     socket.on("map", data => {
       //console.log('map', data );
