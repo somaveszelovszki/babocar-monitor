@@ -35,7 +35,17 @@ export default class SimpleFrom extends React.Component {
           this.setState({ formData: dataCopy })
       }
     componentDidMount() {
-      this.props.socket.on("dataFromSerial", data => this.setState({ serialData: JSON.parse(data) }));
+      this.props.socket.on("dataFromSerial", data => {
+	try {
+		const serialDataParsed = JSON.parse(data);
+		this.setState({ serialData: JSON.parse(data) });
+	}
+	catch(e)
+	{
+		console.log("dataFromSerial JSON parsing error");
+	}
+	//this.setState({ serialData: JSON.parse(data) })
+	});
       this.props.socket.on("dataFromJSON", data => this.setState({ response: data }));
     }
   

@@ -3,6 +3,7 @@ import { Navbar, Container, Col, Row, Table, Button, Tabs, Tab } from "react-boo
 import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
+import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import './Robonaut.css';
@@ -53,7 +54,8 @@ export default class Robonaut extends React.Component {
         "rearLineController_D": 1.0000,
         "targetSpeedOverride": 0.0000,
         "targetSpeedOverrideActive": false
-      }
+      },
+      mapCoordinates: []
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
@@ -243,7 +245,7 @@ export default class Robonaut extends React.Component {
     {
       // error handling?
     }
-    if(serialData)
+    if(serialData && this.state.focusedItem)
     {
       var originalMsg = JSON.stringify(serialData);
       const lockedItem = this.state.focusedItem
@@ -257,22 +259,42 @@ export default class Robonaut extends React.Component {
       console.log('updatedMsg', updatedMsg)
       var newObj = JSON.parse(updatedMsg); 
       console.log('newObj', newObj);
-      this.setState({ serialData: JSON.parse(originalMsg), formData: JSON.parse(newObj) })
+      return { serialData: JSON.parse(originalMsg), formData: newObj }
+      //this.setState({ serialData: JSON.parse(originalMsg), formData: JSON.parse(newObj) })
     }
   }
 
   componentDidMount() {
-    socket.on("dataFromSerial", data => this.updateFormData(data));
-    socket.on("dataFromJSON", data => this.setState({ response: data })); 
-    /*
-    fetch('/form')
-      .then(response => response.json())
-      .then(data => this.setState({ jsonFile: data }, console.log(this.state.jsonFile)))
-      .then(() => {
-        //console.log('componentDidMount: ', this.state.jsonFile)
-      });
-      */
-  }
+    socket.on("dataFromSerial", data => {
+      console.log('dataFromSerial', data );
+      const updatedData = this.updateFormData(data);
+      const parsedData = JSON.parse(data)
+if(parsedData && parsedData.hasOwnProperty('car'))
+{
+      const newCoordinate = { x: (parseFloat(parsedData['car']['pose']['pos_m']['X'])+50), y: (parseFloat(parsedData['car']['pose']['pos_m']['Y'])+50)}
+console.log('Map newCoordinate ', newCoordinate);
+      const newCoordinates = this.state.mapCoordinates
+      newCoordinates.push(newCoordinate)
+if(updatedData && updatedData.hasOwnProperty('serialData') && updatedData.hasOwnProperty('formData'))
+{
+      this.setState({ serialData: updatedData.serialData, formData: updatedData.formData, mapCoordinates: newCoordinates })
+}
+else
+{
+      this.setState({ mapCoordinates: newCoordinates })
+}
+}
+    });
+    socket.on("dataFromJSON", data => { console.log('dataFromJSON', data );
+    this.updateFormData(data); this.setState({ serialData: data }) });
+    socket.on("map", data => {
+      //console.log('map', data );
+      const newCoordinates = this.state.mapCoordinates
+      newCoordinates.push(data)
+      //console.log('newCoordinates', newCoordinates );
+      this.setState({ mapCoordinates: newCoordinates })
+    });
+}
 
   handleClick(e) {
     console.log("Parent handles child click: set focus to ", e)
@@ -520,7 +542,7 @@ export default class Robonaut extends React.Component {
                 {recursiveTable && recursiveTable}
               </Tab>
               <Tab eventKey="map" title="Map" style = {TabStyle}>
-              <img src = {mapIcon} alt = 'Map icon for a future feature.' /> The Map feature will be avaliable here.
+                <Map coordinates = {this.state.mapCoordinates} />
               </Tab>
               <Tab eventKey="tree" title="JSON Tree Viewer" style = {TabStyle}>
               <JsonTree data={this.state.formData} />
