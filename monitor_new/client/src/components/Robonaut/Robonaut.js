@@ -576,7 +576,7 @@ export default class Robonaut extends React.Component {
             </Tabs>          
             </Col>
             <Col sm={6}>
-            {this.state.serialData && <JsonTree data={this.state.serialData} />}
+		<LogViewer socket = {socket} />
             </Col>
           </Row>
         </Container>
