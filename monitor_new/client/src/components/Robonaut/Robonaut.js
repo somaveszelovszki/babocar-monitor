@@ -4,8 +4,6 @@ import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
 import Map from './Map'
-import SimplifiedForm from './SimplifiedForm'
-import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import './Robonaut.css';
