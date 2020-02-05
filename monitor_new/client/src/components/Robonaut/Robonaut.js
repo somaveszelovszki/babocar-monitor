@@ -4,6 +4,8 @@ import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
 import Map from './Map'
+import SimplifiedForm from './SimplifiedForm'
+import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import './Robonaut.css';
@@ -13,7 +15,7 @@ import {
   JsonTree,
 } from 'react-editable-json-tree'
 
-const socket = socketIOClient("10.42.0.39:3001");
+const socket = socketIOClient("localhost:3001");
 
 var counter = 1
 
@@ -30,7 +32,7 @@ export default class Robonaut extends React.Component {
     super(props);
     this.state = {
       jsonFile: null,
-      focusedItem: null,
+      focusedItem: { key: 'motorCtrl_integral_max', value: 5 },
       formData: {
         "car": {
           "pose": {
@@ -71,7 +73,7 @@ export default class Robonaut extends React.Component {
 
   updateValue()
   {
-    console.log('updateValue set speed to ', counter);
+    //console.log('updateValue set speed to ', counter);
     
     var data = this.state.formData
     data['car']['speed'] = counter
@@ -137,7 +139,7 @@ export default class Robonaut extends React.Component {
     if(haystack.hasOwnProperty(needle.key) === true)
     {
       retObject['found'] = true 
-      console.log('Top level parameter found:', needle, retObject['found'])
+      //console.log('Top level parameter found:', needle, retObject['found'])
       retObject['deepness'] !== '' ? retObject['deepness'] += ('-' + needle.key) : retObject['deepness'] += needle.key
     }
     else {
@@ -153,20 +155,20 @@ export default class Robonaut extends React.Component {
   }
 
   onInputChange = (input) => {
-    console.log('onInputChange:', input)    
+    //console.log('onInputChange:', input)    
     var parsedJSON = this.editJSON(this.state.formData, input.key, input.value)
     try {
-      console.log('parsedJSON', parsedJSON);
+      //console.log('parsedJSON', parsedJSON);
       this.setState({formData: parsedJSON})
     }
     catch(e)
     {
       if(e instanceof SyntaxError)
       {
-        console.error(e.message);
+        //console.error(e.message);
       }
       else {
-        console.error(e)
+        //console.error(e)
       }
     }
     /*
@@ -240,7 +242,7 @@ export default class Robonaut extends React.Component {
   updateFormData(serialData)
   {
     const { focusedItem } = this.state
-    console.log(`updateFormData: `, focusedItem);
+    //console.log(`updateFormData: `, focusedItem, serialData);
     if(typeof(serialData) !== 'object')
     {
       // error handling?
@@ -250,54 +252,80 @@ export default class Robonaut extends React.Component {
       var originalMsg = JSON.stringify(serialData);
       const lockedItem = this.state.focusedItem
       const modifedKeyValuePair = '"' + lockedItem.key + '":' + lockedItem.value.toString()
-      const pattern = '"' + lockedItem.key + '":[+-]?[0-9]+[.]?[0-9]?'
+      const pattern = '"' + lockedItem.key + '":[+-]?[0-9]+[.]?[0-9]*'
       let re = new RegExp(pattern)
-      console.log('serialData', originalMsg)
-      console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
-      console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
+      //console.log('serialData', originalMsg)
+      //console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      //console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
       var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
-      console.log('updatedMsg', updatedMsg)
+      //console.log('updatedMsg', updatedMsg)
       var newObj = JSON.parse(updatedMsg); 
-      console.log('newObj', newObj);
+      //console.log('newObj', newObj);
       return { serialData: JSON.parse(originalMsg), formData: newObj }
-      //this.setState({ serialData: JSON.parse(originalMsg), formData: JSON.parse(newObj) })
+      //this.setState({ serialData: JSON.parse(originalMsg), formData: newObj })
     }
   }
 
   componentDidMount() {
-    socket.on("dataFromSerial", data => {
-      console.log('dataFromSerial', data );
+    // dataFromSerial
+    socket.on("dataFromJSON", data => {
+      //console.log('dataFromJSON', data );
       const updatedData = this.updateFormData(data);
-      const parsedData = JSON.parse(data)
-if(parsedData && parsedData.hasOwnProperty('car'))
-{
-      const newCoordinate = { x: (parseFloat(parsedData['car']['pose']['pos_m']['X'])+50), y: (parseFloat(parsedData['car']['pose']['pos_m']['Y'])+50)}
-console.log('Map newCoordinate ', newCoordinate);
+      const newCoordinate = { x: Math.floor(data['car']['pose']['pos_m']['X']), y: Math.floor(data['car']['pose']['pos_m']['Y']) }
       const newCoordinates = this.state.mapCoordinates
-      newCoordinates.push(newCoordinate)
-if(updatedData && updatedData.hasOwnProperty('serialData') && updatedData.hasOwnProperty('formData'))
-{
-      this.setState({ serialData: updatedData.serialData, formData: updatedData.formData, mapCoordinates: newCoordinates })
-}
-else
-{
-      this.setState({ mapCoordinates: newCoordinates })
-}
-}
+      var inArray = false
+      newCoordinates.forEach((element) => {
+        //console.log('Element', element);
+        if(Math.floor(element.x) === Math.floor(newCoordinate.x) && Math.floor(element.y) === Math.floor(newCoordinate.y))
+        {
+          inArray = true
+        }
+      })
+      if(inArray === false)
+      {
+        //console.log('New element', newCoordinate);
+        newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y) })
+        this.setState({ serialData: updatedData.serialData, formData: updatedData.formData, mapCoordinates: newCoordinates })
+      }
+      else
+      {
+        this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
+      }
     });
-    socket.on("dataFromJSON", data => { console.log('dataFromJSON', data );
+    // dataFromJSON
+    socket.on("dataFromSerial", data => { console.log('dataFromSerial', data );
     this.updateFormData(data); this.setState({ serialData: data }) });
     socket.on("map", data => {
       //console.log('map', data );
       const newCoordinates = this.state.mapCoordinates
-      newCoordinates.push(data)
+      var inArray = false
+      newCoordinates.forEach((element) => {
+        //console.log('Element', element);
+        if(Math.floor(element.x) === Math.floor(data.x) && Math.floor(element.y) === Math.floor(data.y))
+        {
+          inArray = true
+        }
+      })
+      if(inArray === false)
+      {
+        //console.log('New element', data);
+        newCoordinates.push({ x: Math.floor(data.x), y: Math.floor(data.y) })
+        this.setState({ mapCoordinates: newCoordinates })
+      }
       //console.log('newCoordinates', newCoordinates );
-      this.setState({ mapCoordinates: newCoordinates })
     });
-}
+    /*
+    fetch('/form')
+      .then(response => response.json())
+      .then(data => this.setState({ jsonFile: data }, console.log(this.state.jsonFile)))
+      .then(() => {
+        //console.log('componentDidMount: ', this.state.jsonFile)
+      });
+      */
+  }
 
   handleClick(e) {
-    console.log("Parent handles child click: set focus to ", e)
+    //console.log("Parent handles child click: set focus to ", e)
     this.setState({focusedItem: e})
   }
 
@@ -335,7 +363,7 @@ else
         //console.log(parseFloat(value.toFixed(4)))
       }
     }
-    console.log('Sending data to serial: ', localData)
+    //console.log('Sending data to serial: ', localData)
     socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
   }
 
@@ -352,7 +380,7 @@ else
       var modifiedValue = value
       if(key.includes('checkbox-') === true)
       {
-        console.log(`This is a checkbox: ${key}`);
+        //console.log(`This is a checkbox: ${key}`);
         modifiedKey = key.split('checkbox-')[1]
       }
       var modifedKeyValuePair = '"' + modifiedKey + '":' + modifiedValue.toString()
@@ -360,16 +388,16 @@ else
       if(key.includes('checkbox-') === true)
       {
         pattern = '"' + modifiedKey + '":(true|false)'
-        console.log(`This is a checkbox pattern: ${pattern}`);
+        //console.log(`This is a checkbox pattern: ${pattern}`);
       }
       let re = new RegExp(pattern)
-      console.log('originalMsg', originalMsg)
-      console.log(`Pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
-      console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
+      //console.log('originalMsg', originalMsg)
+      //console.log(`Pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      //console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
       var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
-      console.log('updatedMsg', updatedMsg)
+      //console.log('updatedMsg', updatedMsg)
       var newObj = JSON.parse(updatedMsg); 
-      console.log('newObj', newObj);
+      //console.log('newObj', newObj);
       return newObj
     }
   }
@@ -379,7 +407,7 @@ else
   var recursiveTable = null
   var table = []
   //console.log('RENDER this.state.formData', this.state.formData);
-  if(typeof this.state.formData === 'object')
+  if(typeof this.state.serialData === 'object')
   {
     var simpleObjects = getSimpleObjects(this.state.formData, 1)
     //console.log('RENDER simpleObjects', simpleObjects);
@@ -473,7 +501,7 @@ else
     var renderedElements = null
     const { focusedItem } = this.state
     var localJson = null
-    focusedItem && console.log("Current focused on rendering: ", focusedItem)
+    //focusedItem && console.log("Current focused on rendering: ", focusedItem)
     /*
     this.state.serialData && console.log('hey',  focusedItem, this.state.formData['motorController_Ti'], this.state.serialData['motorController_Ti'])
     if(this.state.serialData && focusedItem !== 'motorController_Ti' && this.state.formData['motorController_Ti'] != this.state.serialData['motorController_Ti'])
@@ -530,7 +558,7 @@ else
       </Navbar>
         <Row>
             <Col sm={6}>
-            <Tabs defaultActiveKey="simpleform" id="uncontrolled-tab-example">
+            <Tabs defaultActiveKey="map" id="uncontrolled-tab-example">
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
                 <SimpleForm socket = {socket} />
                 {this.state.serialData && <JsonTree data={this.state.serialData} />}
@@ -542,7 +570,7 @@ else
                 {recursiveTable && recursiveTable}
               </Tab>
               <Tab eventKey="map" title="Map" style = {TabStyle}>
-                <Map coordinates = {this.state.mapCoordinates} />
+              <Map coordinates = {this.state.mapCoordinates} />
               </Tab>
               <Tab eventKey="tree" title="JSON Tree Viewer" style = {TabStyle}>
               <JsonTree data={this.state.formData} />
@@ -550,7 +578,7 @@ else
             </Tabs>          
             </Col>
             <Col sm={6}>
-              <LogViewer socket = {socket} />
+            {this.state.serialData && <JsonTree data={this.state.serialData} />}
             </Col>
           </Row>
         </Container>

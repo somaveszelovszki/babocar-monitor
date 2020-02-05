@@ -112,15 +112,22 @@ port.on('open', function() {
 var timestamp = new Date()
 var serialData = '';
 
+var counter = 1.0000;
 const getJsonFile = async socket => {
+  //socket.emit("map", {x: counter++, y: counter+1});
   try {
-    fs.readFile('../robonaut_server/routes/form.json', (err, data) => {
+    fs.readFile('../robonaut_server/bin/serialData.json', (err, data) => {
       if (err) {
           throw err;
       }
       else {
           var jsonFile = JSON.parse(data)
-          console.log(jsonFile)
+          console.log('Send to client with counter=' + counter)
+          jsonFile['motorCtrl_integral_max'] = counter += 0.1;
+          jsonFile['motorCtrl_P'] = counter+6;
+          jsonFile['motorCtrl_I'] = counter-2;
+          jsonFile['car']['pose']['pos_m']['X'] = 10;
+          jsonFile['car']['pose']['pos_m']['Y'] = counter += 0.1;
           socket.emit("dataFromJSON", jsonFile); // Emitting a new message. It will be consumed by the client
       }
     });
@@ -159,10 +166,10 @@ port.on('data', function(data) {
   }
 });
 
-let counter = 0;
 let interval;
 io.on("connection", socket => {
   console.log("New client connected");
+  getJsonFile(socket)
   if (interval) {
     clearInterval(interval);
   }
@@ -170,10 +177,10 @@ io.on("connection", socket => {
     console.log("Client disconnected");
   });
   
-  //interval = setInterval(() => port.write('123456hshshshsh7890123456789012345678901234567890123456789aghshjdjdjd'), 1000);
+  interval = setInterval(() => getJsonFile(socket), 500);
   
   socket.on('dataFromClient', function(data) {
     console.log('DATA FROM CLIENT: ' + data + '\n')
-    port.write(data)
+    //port.write(data)
   });
 });
