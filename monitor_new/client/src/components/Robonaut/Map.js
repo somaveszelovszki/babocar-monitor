@@ -5,6 +5,10 @@ const lineWidth = '2';
 const circleWidth = '1';
 const circleColor = 'black';
 const circleColorActive = 'red';
+const canvasSize = 640
+const canvasWidth = canvasSize 
+const canvasHeight = canvasSize 
+const mapSizeCm = 50*100 // 50 m in cms
 
 class Map extends React.Component {
     constructor(props) {
@@ -12,6 +16,7 @@ class Map extends React.Component {
         this.state = {
             coordinates: this.props.coordinates
         }
+	this.realityToMap = this.realityToMap.bind(this)
       }
     componentDidMount() {
         const canvas = this.refs.canvas
@@ -26,6 +31,9 @@ class Map extends React.Component {
         //console.log('Map componentWillReceiveProps coordinates:', this.props.coordinates);
         this.setState({ coordinates: this.props.coordinates})
     }
+    realityToMap(coordinateCm, axis) {
+		return (axis === 'y' ? -coordinateCm : coordinateCm) * canvasSize / mapSizeCm + canvasSize/2
+	}
     componentDidUpdate(prevProps)
     {
         //console.log('Map componentDidUpdate coordinates:', this.props.coordinates);
@@ -38,8 +46,8 @@ class Map extends React.Component {
           ctx.strokeStyle = lineColor;
           ctx.lineWidth = lineWidth;
           const coordinates = this.props.coordinates
-          ctx.moveTo(coordinates[this.props.coordinates.length-2].x + 50, coordinates[this.props.coordinates.length-2].y + 50);
-          ctx.lineTo(coordinates[this.props.coordinates.length-1].x + 50, coordinates[this.props.coordinates.length-1].y + 50);
+          ctx.moveTo(this.realityToMap(coordinates[this.props.coordinates.length-2].x, 'x'), this.realityToMap(coordinates[this.props.coordinates.length-2].y, 'y'));
+          ctx.lineTo(this.realityToMap(coordinates[this.props.coordinates.length-1].x, 'x'), this.realityToMap(coordinates[this.props.coordinates.length-1].y, 'y'));
           ctx.stroke();
           /*
           for(var i = 0; i < coordinates.length - 1; i++)
@@ -54,7 +62,7 @@ class Map extends React.Component {
     render() {
         return(
           <div>
-            <canvas ref="canvas" width={640} height={1200} />
+            <canvas ref="canvas" width={canvasWidth} height={canvasHeight} />
           </div>
         )
       }

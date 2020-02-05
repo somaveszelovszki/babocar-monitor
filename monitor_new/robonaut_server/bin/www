@@ -159,6 +159,7 @@ port.on('data', function(data) {
       io.emit('logFromSerial', serialData.split('$')[0])
     }
     else {
+      console.log('Serial data', serialData.split('[P]')[1].split('$')[0])
       io.emit("dataFromSerial", serialData.split('[P]')[1].split('$')[0]); // Emitting a new message. It will be consumed by the client
     }
     //console.log('Serial data: ' + serialData.split('$')[0])
