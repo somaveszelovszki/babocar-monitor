@@ -49,6 +49,11 @@ class Map extends React.Component {
           ctx.moveTo(this.realityToMap(coordinates[this.props.coordinates.length-2].x, 'x'), this.realityToMap(coordinates[this.props.coordinates.length-2].y, 'y'));
           ctx.lineTo(this.realityToMap(coordinates[this.props.coordinates.length-1].x, 'x'), this.realityToMap(coordinates[this.props.coordinates.length-1].y, 'y'));
           ctx.stroke();
+          if(coordinates[this.props.coordinates.length-1].hasOwnProperty('junction'))
+          {
+            ctx.font = "10px Arial";
+            ctx.fillText(Math.round(coordinates[this.props.coordinates.length-1]['junction']), this.realityToMap(coordinates[this.props.coordinates.length-1].x+5, 'x'), this.realityToMap(coordinates[this.props.coordinates.length-1].y, 'y'));
+          }
           /*
           for(var i = 0; i < coordinates.length - 1; i++)
           {

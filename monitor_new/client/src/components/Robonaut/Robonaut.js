@@ -265,9 +265,22 @@ export default class Robonaut extends React.Component {
   }
 
   componentDidMount() {
+    // Parse junction from the log message to the map coordinates
+    socket.on("logFromSerial", data => {
+      if(data.includes('currentSeg') === true)
+      {
+        const junctionNumber = parseInt(data.split('junction: ')[1].split(' ')[0])
+        const x = data.split(' (')[1].split(',')[0]
+        const y = data.split(' (')[1].split(',')[1].split(')')[0]
+        const newCoordinate = { x: x, y: y, junction: junctionNumber }
+        const newCoordinates = this.state.mapCoordinates
+        newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y), junction: junctionNumber })
+        this.setState({ mapCoordinates: newCoordinates })
+      }
+    })
     socket.on("dataFromSerial", rawData => {
       console.log('dataFromSerial', rawData );
-      const data = JSON.parse(rawData)
+      const data = rawData
       const updatedData = this.updateFormData(rawData);
       const newCoordinate = { x: Math.round(data['car']['pose']['pos_m']['X'] * 100), y: Math.round(data['car']['pose']['pos_m']['Y'] * 100) }
       const newCoordinates = this.state.mapCoordinates
