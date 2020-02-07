@@ -280,7 +280,7 @@ export default class Robonaut extends React.Component {
     })
     socket.on("dataFromSerial", rawData => {
       console.log('dataFromSerial', rawData );
-      const data = rawData
+      const data = JSON.parse(rawData);
       const updatedData = this.updateFormData(rawData);
       const newCoordinate = { x: Math.round(data['car']['pose']['pos_m']['X'] * 100), y: Math.round(data['car']['pose']['pos_m']['Y'] * 100) }
       const newCoordinates = this.state.mapCoordinates

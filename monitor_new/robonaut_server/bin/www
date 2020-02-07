@@ -182,6 +182,6 @@ io.on("connection", socket => {
   
   socket.on('dataFromClient', function(data) {
     console.log('DATA FROM CLIENT: ' + data + '\n')
-    //port.write(data)
+    port.write(data)
   });
 });
