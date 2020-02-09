@@ -153,11 +153,11 @@ export default class Robonaut extends React.Component {
   }
 
   onInputChange = (input) => {
-    //console.log('onInputChange:', input)    
+    console.log('onInputChange:', input)    
     var parsedJSON = this.editJSON(this.state.formData, input.key, input.value)
     try {
       //console.log('parsedJSON', parsedJSON);
-      this.setState({formData: parsedJSON})
+      this.setState({ formData: parsedJSON, focusedItem: { key: input.key, value: input.value } }, console.log('updated formData', this.state.formData))
     }
     catch(e)
     {
@@ -240,7 +240,7 @@ export default class Robonaut extends React.Component {
   updateFormData(serialData)
   {
     const { focusedItem } = this.state
-    //console.log(`updateFormData: `, focusedItem, serialData);
+    //console.log(`updateFormData: `, focusedItem);
     if(typeof(serialData) !== 'object')
     {
       // error handling?
@@ -252,9 +252,9 @@ export default class Robonaut extends React.Component {
       const modifedKeyValuePair = '"' + lockedItem.key + '":' + lockedItem.value.toString()
       const pattern = '"' + lockedItem.key + '":[+-]?[0-9]+[.]?[0-9]*'
       let re = new RegExp(pattern)
-      //console.log('serialData', originalMsg)
-      //console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
-      //console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
+      // console.log('serialData', originalMsg)
+      // console.log(`pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      // console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
       var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
       //console.log('updatedMsg', updatedMsg)
       var newObj = JSON.parse(updatedMsg); 
@@ -279,9 +279,9 @@ export default class Robonaut extends React.Component {
       }
     })
     socket.on("dataFromSerial", rawData => {
-      console.log('dataFromSerial', rawData );
+      //console.log('dataFromSerial', JSON.parse(rawData) );
       const data = JSON.parse(rawData);
-      const updatedData = this.updateFormData(rawData);
+      const updatedData = this.updateFormData(data);
       const newCoordinate = { x: Math.round(data['car']['pose']['pos_m']['X'] * 100), y: Math.round(data['car']['pose']['pos_m']['Y'] * 100) }
       const newCoordinates = this.state.mapCoordinates
       var inArray = false
@@ -295,7 +295,14 @@ export default class Robonaut extends React.Component {
       if(inArray === false)
       {
         //console.log('New element', newCoordinate);
-        newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y) })
+        if(data.hasOwnProperty('junction'))
+        {
+          newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y), junction: data['junction'] })
+        }
+        else
+        {
+          newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y) })
+        }
         this.setState({ serialData: updatedData.serialData, formData: updatedData.formData, mapCoordinates: newCoordinates })
       }
       else
@@ -304,8 +311,11 @@ export default class Robonaut extends React.Component {
       }
     });
     // dataFromJSON
-    socket.on("dataFromJSON", data => { console.log('dataFromJSON', data );
-    this.updateFormData(data); this.setState({ serialData: data }) });
+    socket.on("dataFromJSON", data => {
+      //console.log('dataFromJSON', data );
+      const updatedData = this.updateFormData(data);
+      this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
+    });
     socket.on("map", data => {
       //console.log('map', data );
       const newCoordinates = this.state.mapCoordinates
@@ -344,7 +354,7 @@ export default class Robonaut extends React.Component {
     //console.log("Parent Enter key handling", e)
     if(event.key === 'Enter')
     {
-      //console.log("Enter key pressed. Submit form to serial port.")
+      console.log("Enter key pressed. Submit form to serial port.")
       this.handleSubmit()
     }
   }
@@ -374,7 +384,7 @@ export default class Robonaut extends React.Component {
         //console.log(parseFloat(value.toFixed(4)))
       }
     }
-    //console.log('Sending data to serial: ', localData)
+    console.log('Sending data to serial: ', localData)
     socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
   }
 
@@ -402,13 +412,13 @@ export default class Robonaut extends React.Component {
         //console.log(`This is a checkbox pattern: ${pattern}`);
       }
       let re = new RegExp(pattern)
-      //console.log('originalMsg', originalMsg)
-      //console.log(`Pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
-      //console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
+      console.log('originalMsg', originalMsg)
+      console.log(`Pattern: ${pattern} and modifedKeyValuePair: ${modifedKeyValuePair}`);
+      console.log(`Testing regexp for string: ${re.test(originalMsg)}`);
       var updatedMsg = originalMsg.replace(re, modifedKeyValuePair);
-      //console.log('updatedMsg', updatedMsg)
+      console.log('updatedMsg', updatedMsg)
       var newObj = JSON.parse(updatedMsg); 
-      //console.log('newObj', newObj);
+      console.log('newObj', newObj);
       return newObj
     }
   }
@@ -569,7 +579,7 @@ export default class Robonaut extends React.Component {
       </Navbar>
         <Row>
             <Col sm={6}>
-            <Tabs defaultActiveKey="map" id="uncontrolled-tab-example">
+            <Tabs defaultActiveKey="genericform" id="uncontrolled-tab-example">
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
                 <SimpleForm socket = {socket} />
                 {this.state.serialData && <JsonTree data={this.state.serialData} />}
@@ -589,7 +599,9 @@ export default class Robonaut extends React.Component {
             </Tabs>          
             </Col>
             <Col sm={6}>
-		<LogViewer socket = {socket} />
+              <div>
+	<LogViewer socket = {socket} />
+              </div>
             </Col>
           </Row>
         </Container>

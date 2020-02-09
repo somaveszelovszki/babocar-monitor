@@ -56,7 +56,7 @@ export default class LogViewer extends React.Component {
   }
   componentDidMount() {
     this.props.socket.on("logFromSerial", data => {
-      console.log('logFromSerial', data);
+      //console.log('logFromSerial', data);
       var newArray = this.state.logs;
       newArray.unshift(data);
       if(this.state.logs.length > maxLength)

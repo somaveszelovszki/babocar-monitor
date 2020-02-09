@@ -181,7 +181,7 @@ io.on("connection", socket => {
   //interval = setInterval(() => getJsonFile(socket), 500);
   
   socket.on('dataFromClient', function(data) {
-    console.log('DATA FROM CLIENT: ' + data + '\n')
+    console.log('DATA FROM CLIENT: ' + data + '\n\n')
     port.write(data)
   });
 });

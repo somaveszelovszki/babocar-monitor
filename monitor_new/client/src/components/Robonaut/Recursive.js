@@ -35,7 +35,7 @@ export function getSimpleObjects(obj, level)
 
 export function generateTable(data, inputChangeHandler, handleEnter, onClickParentHandler)
 {
-  console.log('generateTable', data);
+  //console.log('generateTable', data);
   
   let table = []
   if(typeof data === 'object')

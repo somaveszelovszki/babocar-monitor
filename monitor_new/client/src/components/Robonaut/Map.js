@@ -1,4 +1,5 @@
 import React from "react";
+import mapIcon from '../../resources/img/map.png'
 
 const lineColor = 'black';
 const lineWidth = '2';
@@ -39,7 +40,7 @@ class Map extends React.Component {
         //console.log('Map componentDidUpdate coordinates:', this.props.coordinates);
         if(prevProps.coordinates.length != this.props.coordinates && this.props.coordinates.length >= 2)
         {
-          console.log('componentDidUpdate new coordinate from', this.props.coordinates[this.props.coordinates.length-2], ' to ', this.props.coordinates[this.props.coordinates.length-1]);
+          //console.log('componentDidUpdate new coordinate from', this.props.coordinates[this.props.coordinates.length-2], ' to ', this.props.coordinates[this.props.coordinates.length-1]);
           const canvas = this.refs.canvas
           const ctx = canvas.getContext("2d")
           // Line
@@ -67,6 +68,7 @@ class Map extends React.Component {
     render() {
         return(
           <div>
+		<div style = {{textAlign: "center"}}><h1>Map</h1><img src = {mapIcon} alt = 'Map icon' /></div>
             <canvas ref="canvas" width={canvasWidth} height={canvasHeight} />
           </div>
         )
