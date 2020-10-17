@@ -1,5 +1,5 @@
 {
-  "name": "robonaut-server",
+  "name": "serial-server",
   "version": "0.0.0",
   "private": true,
   "scripts": {
