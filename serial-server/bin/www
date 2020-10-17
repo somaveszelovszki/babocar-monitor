@@ -94,6 +94,13 @@ function onListening() {
 
 const io = socketIo(server)
 
+console.log('List serial ports...');
+SerialPort.list().then(portInfos => {
+  portInfos.forEach(portInfo => {
+    console.log('portInfo', portInfo);
+  })
+})
+
 const serialPortNumber = 'COM28' //'/dev/ttyAMA0'
 
 // var port = new SerialPort('/dev/serial0', {
