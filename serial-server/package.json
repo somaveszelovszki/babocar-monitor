@@ -11,6 +11,7 @@
     "express": "~4.16.1",
     "fs": "0.0.1-security",
     "http-errors": "~1.6.3",
+    "moment": "^2.29.1",
     "morgan": "~1.9.1",
     "serialport": "^8.0.8",
     "socket.io": "^2.3.0"
