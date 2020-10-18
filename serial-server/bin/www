@@ -10,6 +10,7 @@ var http = require('http');
 const socketIo = require("socket.io");
 var SerialPort = require('serialport');
 const fs = require('fs')
+var moment = require('moment');
 
 /**
  * Get port from environment and store in Express.
@@ -101,7 +102,7 @@ SerialPort.list().then(portInfos => {
   })
 })
 
-const serialPortNumber = 'COM28' //'/dev/ttyAMA0'
+const serialPortNumber = 'COM31' //'/dev/ttyAMA0'
 
 // var port = new SerialPort('/dev/serial0', {
 var port = new SerialPort(serialPortNumber, {
@@ -155,8 +156,51 @@ port.on('error', function(err) {
   }
 });
 
+const momentFormatString = "YYYY. MM. DD. HH:mm:ss:SSS"
+const momentFormatStringForFileNames = "YYYY-MM-DD-HH-mm-ss-SSS"
+
+const logWrapper = (message) => {
+  const timestamp = moment().format(momentFormatString);
+  console.log(`[${timestamp}] ${message}`);
+}
+
+var serialLogFileName = '' 
+let interval;
+io.on("connection", socket => {
+  const timestampConnectedClient = moment().format(momentFormatString);
+  console.log(`[${timestampConnectedClient}] New client connected from`, socket.request.headers.origin);
+
+  serialLogFileName = `serial-logs/serial-log-${moment().format(momentFormatStringForFileNames)}.txt`
+  fs.appendFile(serialLogFileName, `Log the created on ${timestampConnectedClient}\n`, (error) => {
+    if (error) throw error;
+    // Write was success, todo here?
+  });
+
+  socket.on("disconnect", (reason) => {
+    const timestampDisconnectedClient = moment().format(momentFormatString);
+    console.log(`[${timestampDisconnectedClient}] Client disconnected with reason:`, reason);
+  });
+  
+  //interval = setInterval(() => getJsonFile(socket), 500);
+  
+  socket.on('dataFromClient', function(data) {
+    logWrapper('DATA FROM CLIENT: ' + data)
+    port.write(data)
+  });
+});
+
 port.on('data', function(data) {
-  //console.log('Serial data: ' + data.toString().trim())
+  const rawData = data.toString().trim()
+  logWrapper('Serial data: ' + rawData)
+  if(serialLogFileName) {
+    fs.appendFile(serialLogFileName, rawData, (error) => {
+      if (error) throw error;
+      // Write was success, todo here?
+    });
+  }
+  else {
+   console.log('Log file is not opened.');
+  }
   serialData += data;
   if (data.indexOf('$') != -1) {
     //timestamp = new Date()
@@ -166,29 +210,11 @@ port.on('data', function(data) {
       io.emit('logFromSerial', serialData.split('$')[0])
     }
     else {
-      console.log('Serial data', serialData.split('[P]')[1].split('$')[0])
-      io.emit("dataFromSerial", serialData.split('[P]')[1].split('$')[0]); // Emitting a new message. It will be consumed by the client
+      const parsedData = serialData.split('[P]')[1].split('$')[0]
+      logWrapper('Serial data' + parsedData)
+      io.emit("dataFromSerial", parsedData); // Emitting a new message. It will be consumed by the client
     }
     //console.log('Serial data: ' + serialData.split('$')[0])
     serialData = '';
   }
-});
-
-let interval;
-io.on("connection", socket => {
-  console.log("New client connected");
-  //getJsonFile(socket)
-  if (interval) {
-    clearInterval(interval);
-  }
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-  
-  //interval = setInterval(() => getJsonFile(socket), 500);
-  
-  socket.on('dataFromClient', function(data) {
-    console.log('DATA FROM CLIENT: ' + data + '\n\n')
-    port.write(data)
-  });
 });
