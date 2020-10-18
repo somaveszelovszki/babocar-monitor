@@ -1,7 +1,5 @@
 import React from "react";
 import { Form } from "react-bootstrap"; // Necessary react-bootstrap components
-/* Page specific CSS file */
-import './Robonaut.css';
 
 export default class InputField extends React.Component {
     constructor(props) {
@@ -13,15 +11,8 @@ export default class InputField extends React.Component {
       this.handleClickBoolean = this.handleClickBoolean.bind(this);
       this.handleChangeBoolean = this.handleChangeBoolean.bind(this);
     }
-    /*
-    componentWillReceiveProps(props) {
-    //componentWillReceiveProps(props) {
-          this.setState({ value: props.value })
-    }
-    */
    componentDidUpdate(prevProps)
    {
-     //console.log('componentDidUpdate', prevProps, prevProps.value, this.props.value);
       if(prevProps.value != this.props.value)
       {
           this.setState({        
@@ -31,10 +22,9 @@ export default class InputField extends React.Component {
   }
 
     handleKeyPress(event) {
-      //console.log("handleKeyPress", event.key)
       if(event.key === 'Enter')
       {
-        //console.log("Enter key pressed. Submit form to serial port.")
+        console.log("Enter key pressed. Submit form to serial port.")
         this.props.handleEnter(event)
       }
     }
@@ -42,24 +32,20 @@ export default class InputField extends React.Component {
       // Input change handler function
       handleChange(event) {
           this.setState({ value: event.target.value }) // Update input field state with new value
-          //console.log('Input', event.target.name, 'changed to', event.target.value)
           this.props.onInputChange({ key: event.target.name, value: event.target.value }) // Pass value to parent component
     }
     
         // Input change handler function
       handleChangeBoolean(event) {
       const key = event.target.id
-      //console.log('Change child boolean element: ' + key + ' to ' + event.target.checked)
           this.props.onInputChange({ key: key, value: event.target.checked }) // Pass value to parent component
     }
     
     handleClick(event) {
-      //console.log('Clicked on child element: ' + event.target.name + ' ' +event.target.value );
       this.props.onClickParentHandler({ key: event.target.name, value: event.target.value }) // Pass value to parent component
     }
   
     handleClickBoolean(event) {
-      //console.log('Clicked on boolean child element: ', event.target.id.split('checkbox-')[1]);
       this.setState({value: !this.state.value}, () => {console.log(this.state.value)})
     }
   
