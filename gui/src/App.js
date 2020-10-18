@@ -3,14 +3,14 @@ import {
   BrowserRouter as Router,
   Route
 } from 'react-router-dom';
-import Robonaut from './components/Robonaut/Robonaut';
+import GuiApplication from './components/GuiApplication';
 
 class App extends Component {
   render() {
     return (
         <Router>
           <div>
-            <Route exact path="/robonaut" component={Robonaut}/>
+            <Route exact path="/" component={GuiApplication}/>
           </div>
         </Router> 
         
