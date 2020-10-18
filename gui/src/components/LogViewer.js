@@ -1,6 +1,5 @@
 import React from "react";
 import { Accordion, Card, ListGroup, Button } from "react-bootstrap"; // Necessary react-bootstrap components
-import './Robonaut.css';
 
 const maxLength = 200
 
@@ -18,58 +17,45 @@ export default class LogViewer extends React.Component {
       logs: []
     }
   }
+
   getColor(type)
   {
     let variant
-    if(type === '[E]')
-    {
+    if(type === '[E]') {
       variant = "danger"
     }
-    else if(type === '[W]')
-    {
+    else if(type === '[W]') {
       variant = "warning"
     }
-    else if(type === '[I]')
-    {
+    else if(type === '[I]') {
       variant = "info"
     }
-    else if(type === '[D]')
-    {
+    else if(type === '[D]') {
       variant = "dark"
     }
-    else
-    {
+    else {
       variant = null
     }
     return variant
   }
+
   addElement()
   {
     var newArray = this.state.logs;
     newArray.unshift('Log message ' + (this.state.logs.length+1));
-    if(this.state.logs.length > maxLength)
-    {
+    if(this.state.logs.length > maxLength) {
       newArray.pop()
     }
     this.setState({ logs: newArray });
-    // <Button variant="success" style = {{marginBottom: '5px', marginLeft: '5px'}} onClick = {() => {this.addElement()}}>Insert</Button>
   }
   componentDidMount() {
     this.props.socket.on("logFromSerial", data => {
-      //console.log('logFromSerial', data);
       var newArray = this.state.logs;
       newArray.unshift(data);
-      if(this.state.logs.length > maxLength)
-      {
+      if(this.state.logs.length > maxLength) {
         newArray.pop()
       }
       this.setState({ logs: newArray });
-      /*
-        console.log(JSON.parse(data));
-        var newArray = this.state.logs;
-        newArray.push(JSON.parse(data));
-        this.setState({ logs: newArray });
-      */
     });
   }
   render() {
