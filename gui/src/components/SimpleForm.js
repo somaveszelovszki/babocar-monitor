@@ -1,7 +1,6 @@
 import React from "react";
 import { Col, Table, Button } from "react-bootstrap"; // Necessary react-bootstrap components
 import InputField from './InputField'
-import './Robonaut.css';
 
 export default class SimpleFrom extends React.Component {
     constructor(props) {
@@ -22,11 +21,9 @@ export default class SimpleFrom extends React.Component {
     }
   
     onInputChange = (input) => {
-          //console.log('Parent component: onInputChange function', input)
       let dataCopy = JSON.parse(JSON.stringify(this.state.formData))
       if(input.key.includes('checkbox-') === true) {
         const key = input.key.split('checkbox-')[1]
-        //console.log('Parent boolean change: ' + key + ' to ' + input.value)
         dataCopy[key] = input.value
           }
           else {
@@ -36,56 +33,37 @@ export default class SimpleFrom extends React.Component {
       }
     componentDidMount() {
       this.props.socket.on("dataFromSerial", data => {
-	try {
-		const serialDataParsed = JSON.parse(data);
-		this.setState({ serialData: JSON.parse(data) });
-	}
-	catch(e)
-	{
-		console.log("dataFromSerial JSON parsing error");
-	}
-	//this.setState({ serialData: JSON.parse(data) })
-	});
+        try {
+          this.setState({ serialData: JSON.parse(data) });
+        }
+        catch(e) {
+          console.log("dataFromSerial JSON parsing error");
+        }
+      });
+
       this.props.socket.on("dataFromJSON", data => this.setState({ response: data }));
     }
   
     handleClick(e) {
-      //console.log("Parent handles child click: set focus to " + e.key)
       this.setState({focusedItem: e.key})
     }
   
     handleEnter(event) {
-      //console.log("Parent Enter key handling", e)
-      if(event.key === 'Enter')
-      {
-        //console.log("Enter key pressed. Submit form to serial port.")
+      if(event.key === 'Enter') {
         this.handleSubmit()
       }
     }
   
     handleSubmit() {
-      //console.log('handleSubmit')
       var localData = this.state.formData
       for (let [key, value] of Object.entries(this.state.formData)) {
-        //console.log({name: key, value: value}, typeof(value))
-        if(typeof(value) === 'number')
-        {
-          //console.log('Number: ', key + ' ' + value)
+        if(typeof(value) === 'number') {
           localData[key] = parseFloat(value).toFixed(4)
         }
-        else if(typeof(value) === 'string')
-        {
-          //console.log('String: ', key + ' ' + value)
-          if(isNaN(parseFloat(value)) === false)
-          {
-            //console.log('From: ', key + ' ' + value + ' (' + typeof(value) + ') to ' + key + ' ' + parseFloat(value).toFixed(4) + ' (' + typeof(parseFloat(value)) + ')')
+        else if(typeof(value) === 'string') {
+          if(isNaN(parseFloat(value)) === false) {
             localData[key] = parseFloat(value).toFixed(4)
           }
-        }
-        if(isNaN(value) === false)
-        {
-          //console.log('handleSubmit: ' + key + ' ' + value)
-          //console.log(parseFloat(value.toFixed(4)))
         }
       }
       console.log('localData', localData)
@@ -124,7 +102,6 @@ export default class SimpleFrom extends React.Component {
         localJson['rearLineController_D'] = this.state.serialData['rearLineController_D']
         this.setState({formData: localJson, serialData: null})
       }
-      //console.log('formData', this.state.formData)
       if(this.state.formData) {
         var inputElements = []
         for (let [key, value] of Object.entries(this.state.formData)) {
@@ -139,19 +116,19 @@ export default class SimpleFrom extends React.Component {
       }
       return (
             <Col>
-            <Table striped bordered hover responsive style={{textAlign: 'center', width: '10%'}} size="sm">
-            <thead>
-                <tr>
-                <td colSpan="2">RobonAut <b>simplified</b> form</td>
-                </tr>
-            </thead>
-            <tbody>
-                {renderedElements}
-                <tr>
-                <td colSpan="2"><Button variant="info" type="submit" onClick={this.handleSubmit}>Send to serial port</Button></td>
-                </tr>
-            </tbody>
-            </Table>
+              <Table striped bordered hover responsive style={{textAlign: 'center', width: '10%'}} size="sm">
+                <thead>
+                    <tr>
+                      <td colSpan="2">RobonAut <b>simplified</b> form</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {renderedElements}
+                    <tr>
+                      <td colSpan="2"><Button variant="info" type="submit" onClick={this.handleSubmit}>Send to serial port</Button></td>
+                    </tr>
+                </tbody>
+              </Table>
             </Col>
       )
     }
