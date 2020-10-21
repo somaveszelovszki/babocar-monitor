@@ -6305,6 +6305,16 @@ a.bg-dark:focus, a.bg-dark:hover, button.bg-dark:focus, button.bg-dark:hover {
     background-color: transparent!important
 }
 
+.bg-buttonInEnableMode {
+    background: rgb(48,135,209)!important;
+    background: linear-gradient(0deg, rgba(48,135,209,1) 0%, rgba(45,45,255,1) 100%)!important;
+}
+
+.bg-buttonInGasMode {
+    background: rgb(209,99,48)!important;
+    background: linear-gradient(0deg, rgba(209,99,48,1) 0%, rgba(255,45,45,1) 100%)!important;
+}
+
 .border {
     border: 1px solid #dee2e6!important
 }
