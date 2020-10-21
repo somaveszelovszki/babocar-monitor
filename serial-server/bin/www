@@ -176,14 +176,12 @@ const initSerialLogFiles = () => {
 }
 
 io.on("connection", socket => {
+
   const timestampConnectedClient = moment().format(momentFormatString);
   console.log(`[${timestampConnectedClient}] New client connected from`, socket.request.headers.origin);
-
-  serialLogFileName = `serial-logs/serial-log-${moment().format(momentFormatStringForFileNames)}.txt`
-  fs.appendFile(serialLogFileName, `Log the created on ${timestampConnectedClient}\n`, (error) => {
-    if (error) throw error;
-    // Write was success, todo here?
-  });
+  initSerialLogFiles()
+  fs.appendFile(serialLogFiles.parameters, `Log file for parameters created on ${timestampConnectedClient}\n`, () => {})
+  fs.appendFile(serialLogFiles.others, `Log file for other messages created on ${timestampConnectedClient}\n`, () => {})
 
   socket.on("disconnect", (reason) => {
     const timestampDisconnectedClient = moment().format(momentFormatString);
