@@ -7,8 +7,8 @@ import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import Header from './Header'
+import ParameterLineChart from './ParameterLineChart'
 import { JsonTree } from 'react-editable-json-tree'
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const socket = socketIOClient(process.env.REACT_APP_SERVER_IP_WITH_PORT || "10.42.0.39:3001");
 
@@ -421,25 +421,7 @@ export default class GuiApplication extends React.Component {
           </Row>
           <Row>
             <Col lg={12} style = {{ height: 600 }}>
-              <ResponsiveContainer>
-                <LineChart
-                  width={500}
-                  height={300}
-                  data={this.state.chartData}
-                  margin={{
-                    top: 5, right: 30, left: 20, bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="speed" stroke="#fc6f03" activeDot={{ r: 8 }} isAnimationActive = {false} />
-                  <Line type="monotone" dataKey="angle" stroke="#03fcbe" isAnimationActive = {false} />
-                  <Line type="monotone" dataKey="sin" stroke="#037bfc" isAnimationActive = {false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <ParameterLineChart data = {this.state.chartData} />
             </Col>
           </Row>
         </Container>
