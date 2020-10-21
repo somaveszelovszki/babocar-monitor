@@ -7,9 +7,8 @@ import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import Header from './Header'
-import {
-  JsonTree,
-} from 'react-editable-json-tree'
+import { JsonTree } from 'react-editable-json-tree'
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const socket = socketIOClient(process.env.REACT_APP_SERVER_IP_WITH_PORT || "10.42.0.39:3001");
 
@@ -27,6 +26,8 @@ export default class GuiApplication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      chartData: [],
+      counter: 0,
       controllerButtonMode: 'enable',
       jsonFile: null,
       focusedItem: { key: 'motorCtrl_integral_max', value: 5 },
@@ -71,6 +72,7 @@ export default class GuiApplication extends React.Component {
     this.searchKey = this.searchKey.bind(this)
     this.editJSON = this.editJSON.bind(this)
     this.updateFormData = this.updateFormData.bind(this)
+    this.addDataToCharts = this.addDataToCharts.bind(this)
   }
 
   updateValue()
@@ -164,6 +166,23 @@ export default class GuiApplication extends React.Component {
     }
   }
 
+  addDataToCharts() {
+    const RADIAN = Math.PI / 180;
+    const sin = Math.sin(2 * RADIAN * (this.state.counter * 300));
+    this.setState(prevState => ({
+      chartData: [
+        ...prevState.chartData, 
+        {
+          'speed': this.state.counter + 1,
+          'angle': (this.state.counter + 1) % 6,
+          'sin': sin
+        }
+      ],
+      counter: this.state.counter + 1
+    }))
+    console.log('chartData', this.state.chartData);
+  }
+
   componentDidMount() {
     socket.on("logFromSerial", data => {
       if(data.includes('currentSeg') === true)
@@ -222,6 +241,11 @@ export default class GuiApplication extends React.Component {
         this.setState({ mapCoordinates: newCoordinates })
       }
     });
+    this.timerID = setInterval(this.addDataToCharts, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID)
   }
 
   handleClick(e) {
@@ -387,12 +411,35 @@ export default class GuiApplication extends React.Component {
               <Tab eventKey="tree" title="JSON Tree Viewer" style = {TabStyle}>
               <JsonTree data={this.state.formData} />
               </Tab>
-            </Tabs>          
+            </Tabs>  
             </Col>
             <Col sm={6}>
               <div>
 	              <LogViewer socket = {socket} />
               </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={12} style = {{ height: 600 }}>
+              <ResponsiveContainer>
+                <LineChart
+                  width={500}
+                  height={300}
+                  data={this.state.chartData}
+                  margin={{
+                    top: 5, right: 30, left: 20, bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="speed" stroke="#fc6f03" activeDot={{ r: 8 }} isAnimationActive = {false} />
+                  <Line type="monotone" dataKey="angle" stroke="#03fcbe" isAnimationActive = {false} />
+                  <Line type="monotone" dataKey="sin" stroke="#037bfc" isAnimationActive = {false} />
+                </LineChart>
+              </ResponsiveContainer>
             </Col>
           </Row>
         </Container>
