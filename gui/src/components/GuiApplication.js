@@ -1,13 +1,12 @@
 import React from "react";
-import { Navbar, Container, Col, Row, Table, Button, Tabs, Tab, ListGroup, Alert } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Container, Col, Row, Table, Button, Tabs, Tab } from "react-bootstrap"; // Necessary react-bootstrap components
 import socketIOClient from "socket.io-client";
 import InputField from './InputField'
 import SimpleForm from './SimpleForm'
 import Map from './Map'
 import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
-import logo from '../resources/img/logo.png'
-import StatusBar from './StatusBar'
+import Header from './Header'
 import {
   JsonTree,
 } from 'react-editable-json-tree'
@@ -28,6 +27,7 @@ export default class GuiApplication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      controllerButtonMode: 'enable',
       jsonFile: null,
       focusedItem: { key: 'motorCtrl_integral_max', value: 5 },
       formData: {
@@ -361,28 +361,13 @@ export default class GuiApplication extends React.Component {
     return (
       <div>
         <Container fluid style = {{ position: 'relative' }}>
-        <Navbar bg="light" variant="light" style = {{textAlign: 'center', marginBottom: '5px'}}>
-        <Navbar.Brand href="#home">
-          <img
-            alt=""
-            src={logo}
-            width="75"
-            height="75"
-            className="d-inline-block align-top"
-          />{' '}
-        </Navbar.Brand>
-        <div style = {{color: 'black'}}>
-          Unemployed &amp; Single
-        </div>
-        <div style = {{ margin: 10, position: 'absolute', right: 0 }}>
-          <StatusBar
+          <Header
             posX = {this.state.formData['car']['pose']['pose_m']['X']}
             posY = {this.state.formData['car']['pose']['pose_m']['Y']}
             angle = {this.state.formData['car']['pose']['angle_deg']}
             speed = {this.state.formData['car']['speed_mps']}
+            controllerButtonMode = {this.state.controllerButtonMode}
           />
-        </div>
-      </Navbar>
         <Row>
             <Col sm={6}>
             <Tabs defaultActiveKey="genericform" id="uncontrolled-tab-example">
