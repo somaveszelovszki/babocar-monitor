@@ -164,8 +164,17 @@ const logWrapper = (message) => {
   console.log(`[${timestamp}] ${message}`);
 }
 
-var serialLogFileName = '' 
-let interval;
+var serialLogFiles = {
+  parameters: '',
+  others: ''
+}
+
+const initSerialLogFiles = () => {
+  const timestampInFilename = moment().format(momentFormatStringForFileNames)
+  serialLogFiles.parameters = `serial-logs/serial-log-parameters-${timestampInFilename}.txt`
+  serialLogFiles.others = `serial-logs/serial-log-others-${timestampInFilename}.txt`
+}
+
 io.on("connection", socket => {
   const timestampConnectedClient = moment().format(momentFormatString);
   console.log(`[${timestampConnectedClient}] New client connected from`, socket.request.headers.origin);
