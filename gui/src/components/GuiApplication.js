@@ -26,6 +26,7 @@ export default class GuiApplication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isChartEnabled: false,
       chartData: [],
       counter: 0,
       controllerButtonMode: 'enable',
@@ -167,20 +168,22 @@ export default class GuiApplication extends React.Component {
   }
 
   addDataToCharts() {
-    const RADIAN = Math.PI / 180;
-    const sin = Math.sin(2 * RADIAN * (this.state.counter * 300));
-    this.setState(prevState => ({
-      chartData: [
-        ...prevState.chartData, 
-        {
-          'speed': this.state.counter + 1,
-          'angle': (this.state.counter + 1) % 6,
-          'sin': sin
-        }
-      ],
-      counter: this.state.counter + 1
-    }))
-    console.log('chartData', this.state.chartData);
+    if(this.state.isChartEnabled) {
+      const RADIAN = Math.PI / 180;
+      const sin = Math.sin(2 * RADIAN * (this.state.counter * 300));
+      this.setState(prevState => ({
+        chartData: [
+          ...prevState.chartData, 
+          {
+            'speed': this.state.counter + 1,
+            'angle': (this.state.counter + 1) % 6,
+            'sin': sin
+          }
+        ],
+        counter: this.state.counter + 1
+      }))
+      console.log('chartData', this.state.chartData);
+    }
   }
 
   componentDidMount() {
@@ -421,7 +424,28 @@ export default class GuiApplication extends React.Component {
           </Row>
           <Row>
             <Col lg={12} style = {{ height: 600 }}>
-              <ParameterLineChart data = {this.state.chartData} />
+              <div style = {{ textAlign: 'center' }}>
+                <label>
+                  Enable chart: 
+                <input
+                  name="isChartEnabled"
+                  type="checkbox"
+                  checked={this.state.isChartEnabled}
+                  onChange={this.handleInputChange}
+                  style = {{ marginLeft: '10px' }}
+                />
+                </label>
+                { this.state.isChartEnabled && (
+                  <Button
+                    variant="danger"
+                    onClick={() => this.setState({ chartData: [] })}
+                    style = {{ marginLeft: '10px' }}
+                  >
+                    Clear chart data
+                  </Button>
+                )}
+              </div>
+              { this.state.isChartEnabled && <ParameterLineChart data = {this.state.chartData} /> }
             </Col>
           </Row>
         </Container>
