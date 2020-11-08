@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Col, Row, Table, Button, Tabs, Tab } from "react-bootstrap"; // Necessary react-bootstrap components
 import socketIOClient from "socket.io-client";
 import InputField from './InputField'
+import RefactoredForm from './RefactoredForm'
 import SimpleForm from './SimpleForm'
 import Map from './Map'
 import { getSimpleObjects } from './Recursive'
@@ -397,7 +398,10 @@ export default class GuiApplication extends React.Component {
           />
         <Row>
             <Col sm={6}>
-            <Tabs defaultActiveKey="genericform" id="uncontrolled-tab-example">
+            <Tabs defaultActiveKey="refactoredFrom" id="uncontrolled-tab-example">
+              <Tab eventKey="refactoredFrom" title="Refactored form" style = {TabStyle}>
+                <RefactoredForm socket = {socket} />
+              </Tab>
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
                 <SimpleForm socket = {socket} />
                 {this.state.serialData && <JsonTree data={this.state.serialData} />}
