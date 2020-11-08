@@ -235,11 +235,29 @@ io.on("connection", socket => {
 
 });
 
+var firstDataReceived = false
 const handleSerialMessage = (serialMessage) => {
 
   // Handle P messages
   if(serialMessage.includes('[P]') === true) {
     const parsedData = serialMessage.split('[P]')[1].split('$')[0]
+    if(!firstDataReceived) {
+      // Write CSV header to the file
+      logWrapper('firstDataReceived!')
+      if(serialLogFiles.parameters) {
+        try {
+          const jsonData = JSON.parse(parsedData)
+          const keys = Object.keys(jsonData)
+          console.log(keys);
+          console.log(keys.join(','));
+          fs.appendFile(serialLogFiles.parameters, `${keys.join(',')}\n`);
+        }
+        catch(error) {
+          logWrapper(error)
+        }
+      }
+      firstDataReceived = true
+    }
     logWrapper('Serial message with P:' + parsedData)
     io.emit("dataFromSerial", parsedData);
     if(serialLogFiles.parameters) {
