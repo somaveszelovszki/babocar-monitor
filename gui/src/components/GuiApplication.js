@@ -75,6 +75,7 @@ export default class GuiApplication extends React.Component {
     this.editJSON = this.editJSON.bind(this)
     this.updateFormData = this.updateFormData.bind(this)
     this.addDataToCharts = this.addDataToCharts.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
   }
 
   updateValue()
@@ -306,6 +307,16 @@ export default class GuiApplication extends React.Component {
       console.log('newObj', newObj);
       return newObj
     }
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
   }
 
   render() {
