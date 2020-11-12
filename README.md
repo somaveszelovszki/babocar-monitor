@@ -1,4 +1,10 @@
 # babocar-monitor
+
+## Raspberry Pi login
+IP address: 192.168.0.31
+username: pi
+password: raspberry
+
 ## Starting the test environment
 1. ```cd ./babocar-monitor/gui && npm start```
 2. ```cd ./babocar-monitor/serial-monitor && npm start```
