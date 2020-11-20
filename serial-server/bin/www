@@ -120,28 +120,6 @@ var timestamp = new Date()
 var serialData = '';
 
 var counter = 1.0000;
-const getJsonFile = async socket => {
-  //socket.emit("map", {x: counter++, y: counter+1});
-  try {
-    fs.readFile('../robonaut_server/bin/serialData.json', (err, data) => {
-      if (err) {
-          throw err;
-      }
-      else {
-          var jsonFile = JSON.parse(data)
-          console.log('Send to client with counter=' + counter)
-          jsonFile['motorCtrl_integral_max'] = counter += 0.1;
-          jsonFile['motorCtrl_P'] = counter+6;
-          jsonFile['motorCtrl_I'] = counter-2;
-          jsonFile['car']['pose']['pos_m']['X'] = 10;
-          jsonFile['car']['pose']['pos_m']['Y'] = counter += 0.1;
-          socket.emit("dataFromJSON", jsonFile); // Emitting a new message. It will be consumed by the client
-      }
-    });
-  } catch (error) {
-    console.error(`Error: ${error}`);
-  }
-};
  
 // open errors will be emitted as an error event 
 port.on('error', function(err) {
