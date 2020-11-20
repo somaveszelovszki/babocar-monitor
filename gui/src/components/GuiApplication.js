@@ -425,7 +425,7 @@ export default class GuiApplication extends React.Component {
             <Col sm={6}>
             <Tabs defaultActiveKey="refactoredFrom" id="uncontrolled-tab-example">
               <Tab eventKey="refactoredFrom" title="Refactored form" style = {TabStyle}>
-                <RefactoredForm socket = {socket} />
+                <RefactoredForm socket = {socket} forwardisRemoteControlled = {this.handleIsRemoteControlled} />
               </Tab>
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
                 <SimpleForm socket = {socket} />
