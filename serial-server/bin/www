@@ -172,18 +172,28 @@ const simulateSerialRx = () => {
     counter += 0.25
     if(typeof(value) === 'object') {
       value.forEach((singleValue, index) => {
-        //console.log('value.forEach', index, singleValue, counter);
         switch(index) {
-          case 1: simulatedJson['speed'] = counter; break;
-          case 2: simulatedJson['angle'] = counter + 2; break;
-          case 3: simulatedJson['distance'] = counter * 10; break;
+          case 0: simulatedJson['posXm'] = counter; break;
+          case 1: simulatedJson['posYm'] = counter + 2; break;
+          case 2: simulatedJson['absAngleDeg'] = counter * 10; break;
+          case 3: simulatedJson['speedMps'] = counter * 10; break;
+          case 4: simulatedJson['distanceM'] = counter * 10; break;
+          case 5: simulatedJson['orientedDistanceM'] = counter * 10; break;
+          case 6: simulatedJson['frontWheelAngleDeg'] = counter * 10; break;
+          case 7: simulatedJson['rearWheelAngleDeg'] = counter * 10; break;
+          case 8: simulatedJson['yawRateDegps'] = counter * 10; break;
         }
       })
     }
     else {
       //console.log(`First level: ${key}: ${value}`);
-      // Add first level key-values to result json
-      simulatedJson[key] = value
+      if(key === 'isRemoteControlled') {
+        simulatedJson[key] = (parseInt(counter) % 2 === 0) ? true : false
+      }
+      else {
+        // Add first level key-values to result json
+        simulatedJson[key] = value
+      }
     }
   }
   counter += 0.25
