@@ -155,12 +155,13 @@ const initSerialLogFiles = () => {
 var timerHandle;
 var counter = 10.00
 var simulatedSerialData = {
-  "car": [ counter, counter + 1.5, 2 * counter, 30, 40, 50 ],
+  "car": [ counter, counter + 1.1, 2 * counter, counter + 2, counter + 3, counter + 4, counter + 5, counter + 6, counter + 7 ],
   "motorCtrl_integral_max": 4,
   "motorCtrl_P": 1,
   "motorCtrl_I": 10,
   "frontLineCtrl_P_slow": 1.5,
-  "frontLineCtrl_D_slow": 100
+  "frontLineCtrl_D_slow": 100,
+  "isRemoteControlled": true
 }
 
 const simulateSerialRx = () => {
