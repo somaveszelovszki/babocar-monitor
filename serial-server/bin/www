@@ -276,7 +276,13 @@ const handleSerialMessage = (serialMessage) => {
       firstDataReceived = true
     }
     logWrapper('Serial message with P:' + parsedData)
-    io.emit("dataFromSerial", parsedData);
+    try {
+      transformSerialData(JSON.parse(parsedData))
+    }
+    catch(error) {
+      logWrapper(error)
+    }
+    //io.emit("dataFromSerial", parsedData);
     if(serialLogFiles.parameters) {
       fs.appendFile(serialLogFiles.parameters, `${parsedData}\n`);
     }
