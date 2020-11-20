@@ -102,9 +102,9 @@ SerialPort.list().then(portInfos => {
   })
 })
 
-const serialPort = '/dev/serial0'
+const serialPortNumber = 'COM29' //'/dev/ttyAMA0'
 
-var port = new SerialPort(serialPort, {
+var port = new SerialPort(serialPortNumber, {
    baudRate: 115200,
    dataBits: 8,
    parity: 'none',
@@ -113,7 +113,7 @@ var port = new SerialPort(serialPort, {
 });
  
 port.on('open', function() {
-  console.log('Serial port opened: ' + serialPort)
+  console.log('Serial port opened: ' + serialPortNumber)
 });
 
 var timestamp = new Date()

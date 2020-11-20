@@ -201,8 +201,13 @@ export default class GuiApplication extends React.Component {
         this.setState({ mapCoordinates: newCoordinates })
       }
     })
+    /*
     socket.on("dataFromSerial", rawData => {
-      const data = JSON.parse(rawData);
+      console.log('dataFromSerial', typeof(rawData), rawData);
+      const data = typeof(rawData) !== 'object' ? JSON.parse(rawData) : rawData;
+    });
+    */
+    /*
       const updatedData = this.updateFormData(data);
       const newCoordinate = {
         x: Math.round(data['car']['pose']['pos_m']['X'] * 100),
@@ -229,10 +234,13 @@ export default class GuiApplication extends React.Component {
         this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
       }
     });
+    */
+    /*
     socket.on("dataFromJSON", data => {
       const updatedData = this.updateFormData(data);
       this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
     });
+    */
     socket.on("map", data => {
       const newCoordinates = this.state.mapCoordinates
       var inArray = false
