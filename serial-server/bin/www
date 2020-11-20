@@ -201,6 +201,34 @@ const simulateSerialRx = () => {
   io.emit("dataFromSerial", JSON.stringify(simulatedJson));
 }
 
+const transformSerialData = (rawData) => {
+  logWrapper('transformSerialData: ' + rawData)
+  let simulatedJson = {}
+  for (const [key, value] of Object.entries(rawData)) {
+    if(typeof(value) === 'object') {
+      value.forEach((singleValue, index) => {
+        switch(index) {
+          case 0: simulatedJson['posXm'] = singleValue; break;
+          case 1: simulatedJson['posYm'] = singleValue; break;
+          case 2: simulatedJson['absAngleDeg'] = singleValue; break;
+          case 3: simulatedJson['speedMps'] = singleValue; break;
+          case 4: simulatedJson['distanceM'] = singleValue; break;
+          case 5: simulatedJson['orientedDistanceM'] = singleValue; break;
+          case 6: simulatedJson['frontWheelAngleDeg'] = singleValue; break;
+          case 7: simulatedJson['rearWheelAngleDeg'] = singleValue; break;
+          case 8: simulatedJson['yawRateDegps'] = singleValue; break;
+        }
+      })
+    }
+    else {
+      // Add first level key-values to result json
+      simulatedJson[key] = value
+    }
+  }
+  //console.log('simulatedJson', simulatedJson);
+  io.emit("dataFromSerial", JSON.stringify(simulatedJson));
+}
+
 io.on("connection", socket => {
 
   const timestampConnectedClient = moment().format(momentFormatString);
