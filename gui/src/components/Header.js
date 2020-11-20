@@ -11,7 +11,7 @@ export default class Header extends React.Component {
 
   render() {
 
-    const headerVariant = this.props.controllerButtonMode === 'enable' ? 'buttonInEnableMode' : 'buttonInGasMode';
+    const headerVariant = this.props.controllerButtonMode === true ? 'buttonInEnableMode' : 'buttonInGasMode';
 
     return (
         <Navbar bg={headerVariant} variant="light" style = {{textAlign: 'center', marginBottom: '5px'}}>
