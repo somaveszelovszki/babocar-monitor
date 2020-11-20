@@ -39,6 +39,9 @@ export default class RefactoredForm extends React.Component {
         dataForUpdate[focusedKey] = formDataToUpdate[focusedKey]
       }
       console.log('dataForUpdate', dataForUpdate);
+      if(dataForUpdate.hasOwnProperty('isRemoteControlled')) {
+        this.props.forwardisRemoteControlled(dataForUpdate.isRemoteControlled)
+      }
       this.setState({ formData: dataForUpdate })
     }
 
