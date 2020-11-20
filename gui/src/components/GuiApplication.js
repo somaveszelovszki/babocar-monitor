@@ -63,7 +63,8 @@ export default class GuiApplication extends React.Component {
         "targetSpeedOverride": 0.0000,
         "targetSpeedOverrideActive": false
       },
-      mapCoordinates: []
+      mapCoordinates: [],
+      isRemoteControlled: false
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
@@ -76,6 +77,11 @@ export default class GuiApplication extends React.Component {
     this.updateFormData = this.updateFormData.bind(this)
     this.addDataToCharts = this.addDataToCharts.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleIsRemoteControlled = this.handleIsRemoteControlled.bind(this)
+  }
+
+  handleIsRemoteControlled(isRemoteControlled) {
+    this.setState( { isRemoteControlled: isRemoteControlled }, console.log({ isRemoteControlled }))
   }
 
   updateValue()
@@ -413,7 +419,7 @@ export default class GuiApplication extends React.Component {
             posY = {this.state.formData['car']['pose']['pose_m']['Y']}
             angle = {this.state.formData['car']['pose']['angle_deg']}
             speed = {this.state.formData['car']['speed_mps']}
-            controllerButtonMode = {this.state.controllerButtonMode}
+            controllerButtonMode = {this.state.isRemoteControlled}
           />
         <Row>
             <Col sm={6}>
