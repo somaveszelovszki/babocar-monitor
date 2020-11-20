@@ -237,12 +237,12 @@ io.on("connection", socket => {
   fs.appendFile(serialLogFiles.parameters, `Log file for parameters created on ${timestampConnectedClient}\n`, () => {})
   fs.appendFile(serialLogFiles.others, `Log file for other messages created on ${timestampConnectedClient}\n`, () => {})
 
-  timerHandle = setInterval(simulateSerialRx, 2000)
+  //timerHandle = setInterval(simulateSerialRx, 2000)
 
   socket.on("disconnect", (reason) => {
     const timestampDisconnectedClient = moment().format(momentFormatString);
     console.log(`[${timestampDisconnectedClient}] Client disconnected with reason:`, reason);
-    clearInterval(timerHandle)
+    //clearInterval(timerHandle)
   });
   
   socket.on('dataFromClient', function(data) {
