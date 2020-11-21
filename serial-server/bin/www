@@ -102,7 +102,7 @@ SerialPort.list().then(portInfos => {
   })
 })
 
-const serialPortNumber = 'COM29' //'/dev/ttyAMA0'
+const serialPortNumber = '/dev/ttyAMA0'
 
 var port = new SerialPort(serialPortNumber, {
    baudRate: 115200,
@@ -164,42 +164,42 @@ var simulatedSerialData = {
   "isRemoteControlled": true
 }
 
-const simulateSerialRx = () => {
-  //logWrapper('simulateSerialRx: ' + counter)
-  counter += 0.25
-  let simulatedJson = {}
-  for (const [key, value] of Object.entries(simulatedSerialData)) {
-    counter += 0.25
-    if(typeof(value) === 'object') {
-      value.forEach((singleValue, index) => {
-        switch(index) {
-          case 0: simulatedJson['posXm'] = counter; break;
-          case 1: simulatedJson['posYm'] = counter + 2; break;
-          case 2: simulatedJson['absAngleDeg'] = counter * 10; break;
-          case 3: simulatedJson['speedMps'] = counter * 10; break;
-          case 4: simulatedJson['distanceM'] = counter * 10; break;
-          case 5: simulatedJson['orientedDistanceM'] = counter * 10; break;
-          case 6: simulatedJson['frontWheelAngleDeg'] = counter * 10; break;
-          case 7: simulatedJson['rearWheelAngleDeg'] = counter * 10; break;
-          case 8: simulatedJson['yawRateDegps'] = counter * 10; break;
-        }
-      })
-    }
-    else {
-      //console.log(`First level: ${key}: ${value}`);
-      if(key === 'isRemoteControlled') {
-        simulatedJson[key] = (parseInt(counter) % 2 === 0) ? true : false
-      }
-      else {
-        // Add first level key-values to result json
-        simulatedJson[key] = value
-      }
-    }
-  }
-  counter += 0.25
-  //console.log('simulatedJson', simulatedJson);
-  io.emit("dataFromSerial", JSON.stringify(simulatedJson));
-}
+//const simulateSerialRx = () => {
+//  //logWrapper('simulateSerialRx: ' + counter)
+//  counter += 0.25
+//  let simulatedJson = {}
+//  for (const [key, value] of Object.entries(simulatedSerialData)) {
+//    counter += 0.25
+//    if(typeof(value) === 'object') {
+//      value.forEach((singleValue, index) => {
+//        switch(index) {
+//          case 0: simulatedJson['posXm'] = counter; break;
+//          case 1: simulatedJson['posYm'] = counter + 2; break;
+//          case 2: simulatedJson['absAngleDeg'] = counter * 10; break;
+//          case 3: simulatedJson['speedMps'] = counter * 10; break;
+//          case 4: simulatedJson['distanceM'] = counter * 10; break;
+//          case 5: simulatedJson['orientedDistanceM'] = counter * 10; break;
+//          case 6: simulatedJson['frontWheelAngleDeg'] = counter * 10; break;
+//          case 7: simulatedJson['rearWheelAngleDeg'] = counter * 10; break;
+//          case 8: simulatedJson['yawRateDegps'] = counter * 10; break;
+//        }
+//      })
+//    }
+//    else {
+//      //console.log(`First level: ${key}: ${value}`);
+//      if(key === 'isRemoteControlled') {
+//        simulatedJson[key] = (parseInt(counter) % 2 === 0) ? true : false
+//      }
+//      else {
+//        // Add first level key-values to result json
+//        simulatedJson[key] = value
+//      }
+//    }
+//  }
+//  counter += 0.25
+//  //console.log('simulatedJson', simulatedJson);
+//  io.emit("dataFromSerial", JSON.stringify(simulatedJson));
+//}
 
 const transformSerialData = (rawData) => {
   logWrapper('transformSerialData: ' + rawData)
@@ -282,7 +282,7 @@ const handleSerialMessage = (serialMessage) => {
     catch(error) {
       logWrapper(error)
     }
-    //io.emit("dataFromSerial", parsedData);
+    io.emit("dataFromSerial", parsedData);
     if(serialLogFiles.parameters) {
       fs.appendFile(serialLogFiles.parameters, `${parsedData}\n`);
     }
