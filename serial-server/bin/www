@@ -202,21 +202,21 @@ var simulatedSerialData = {
 //}
 
 const transformSerialData = (rawData) => {
-  logWrapper('transformSerialData: ' + rawData)
+  logWrapper('transformSerialData: ' + JSON.stringify(rawData))
   let simulatedJson = {}
   for (const [key, value] of Object.entries(rawData)) {
     if(typeof(value) === 'object') {
       value.forEach((singleValue, index) => {
         switch(index) {
-          case 0: simulatedJson['posXm'] = singleValue; break;
-          case 1: simulatedJson['posYm'] = singleValue; break;
-          case 2: simulatedJson['absAngleDeg'] = singleValue; break;
-          case 3: simulatedJson['speedMps'] = singleValue; break;
-          case 4: simulatedJson['distanceM'] = singleValue; break;
-          case 5: simulatedJson['orientedDistanceM'] = singleValue; break;
-          case 6: simulatedJson['frontWheelAngleDeg'] = singleValue; break;
-          case 7: simulatedJson['rearWheelAngleDeg'] = singleValue; break;
-          case 8: simulatedJson['yawRateDegps'] = singleValue; break;
+          case 0: simulatedJson['posX_m'] = singleValue; break;
+          case 1: simulatedJson['posY_m'] = singleValue; break;
+          case 2: simulatedJson['absAngle_deg'] = singleValue; break;
+          case 3: simulatedJson['speed_mps'] = singleValue; break;
+          case 4: simulatedJson['distance_m'] = singleValue; break;
+          case 5: simulatedJson['orientedDistance_m'] = singleValue; break;
+          case 6: simulatedJson['frontWheelAngle_deg'] = singleValue; break;
+          case 7: simulatedJson['rearWheelAngle_deg'] = singleValue; break;
+          case 8: simulatedJson['yawRate_degps'] = singleValue; break;
         }
       })
     }
@@ -225,7 +225,7 @@ const transformSerialData = (rawData) => {
       simulatedJson[key] = value
     }
   }
-  //console.log('simulatedJson', simulatedJson);
+  console.log('simulatedJson', simulatedJson);
   io.emit("dataFromSerial", JSON.stringify(simulatedJson));
 }
 
@@ -275,33 +275,37 @@ const handleSerialMessage = (serialMessage) => {
       }
       firstDataReceived = true
     }
-    logWrapper('Serial message with P:' + parsedData)
+    //logWrapper('Serial message with P:' + parsedData)
     try {
       transformSerialData(JSON.parse(parsedData))
     }
     catch(error) {
       logWrapper(error)
     }
-    io.emit("dataFromSerial", parsedData);
+    //io.emit("dataFromSerial", parsedData);
     if(serialLogFiles.parameters) {
-      fs.appendFile(serialLogFiles.parameters, `${parsedData}\n`);
+      //fs.appendFile(serialLogFiles.parameters, `${parsedData}\n`);
     }
   }
   // Handle other messages
   else {
-    const parsedData = serialMessage.split('$')[0]
-    logWrapper('Serial message without P:' + parsedData)
+    parsedData = serialMessage.split('$')[0]
+
+    // cuts off leading new-line and caret return characters
+    if (parsedData[0] == '\r') {
+      parsedData = parsedData.substr(2)
+    }
+
+    //logWrapper('Serial message without P:' + parsedData)
     io.emit('logFromSerial', parsedData)
     if(serialLogFiles.others) {
-      fs.appendFile(serialLogFiles.others, `${parsedData}\n`);
+      //fs.appendFile(serialLogFiles.others, `${parsedData}\n`);
     }
   }
 
 }
 
 port.on('data', function(data) {
-  const rawData = data.toString().trim()
-  logWrapper('Serial data: ' + rawData)
   serialData += data;
   if (data.indexOf('$') != -1) { 
     handleSerialMessage(serialData)
