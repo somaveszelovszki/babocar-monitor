@@ -83,7 +83,7 @@ export default class RefactoredForm extends React.Component {
         }
       }
       console.log('localData', localData)
-      this.props.socket.emit('dataFromClient', '[P]' + JSON.stringify(localData))
+      this.props.socket.emit('dataFromClient', '[P]' + JSON.stringify(localData) + '$')
     }
     render() {
       var renderedElements = null
