@@ -25,11 +25,11 @@ export default class RefactoredForm extends React.Component {
       if(input.key.includes('checkbox-') === true) {
         const key = input.key.split('checkbox-')[1]
         dataCopy[key] = input.value
-          }
-          else {
-              dataCopy[input.key] = input.value
-          }
-          this.setState({ formData: dataCopy })
+      }
+      else {
+          dataCopy[input.key] = input.value
+      }
+      this.setState({ formData: dataCopy })
       }
 
     updateFormData = (serialData) => {
@@ -119,7 +119,16 @@ export default class RefactoredForm extends React.Component {
           inputElements.push({name: key, value: value})
         }
         renderedElements = inputElements.map(element => {
-          return <InputField key = {'input-'+element.name} name={element.name} value={element.value} onInputChange={this.onInputChange} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
+          return (
+            <InputField
+              key = {'input-'+element.name}
+              name={element.name}
+              value={element.value}
+              onInputChange={this.onInputChange}
+              onClickParentHandler={(e) => this.handleClick(e)}
+              handleEnter={(e) => this.handleEnter(e)}
+            />
+          )
         })
       }
       else {
@@ -159,6 +168,16 @@ export default class RefactoredForm extends React.Component {
                         />
                       </td>
                     </tr>
+                    <tr>
+                      <td colSpan="2">
+                        <Button
+                          variant="info"
+                          type="submit"
+                          onClick={this.handleSubmit}
+                        >
+                          Send to serial port
+                        </Button>
+                      </td>
                     </tr>
                 </tbody>
               </Table>
