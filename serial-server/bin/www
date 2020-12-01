@@ -280,7 +280,7 @@ io.on("connection", socket => {
     catch(e) {
       console.error('Exception', e);
     }
-    logWrapper('Data from client modified' + JSON.stringify(data))
+    logWrapper('Data from client modified' + JSON.stringify(dataToParse))
     const dataAsStringToSerial = `[P]${JSON.stringify(dataToParse)}$`
     port.write(dataAsStringToSerial)
   });
