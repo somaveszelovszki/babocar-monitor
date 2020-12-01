@@ -252,7 +252,7 @@ io.on("connection", socket => {
     data = data.replace('$', '')
     try {
       dataToParse = JSON.parse(data)
-      console.log('Parsed JSON', dataToParse);
+      //console.log('Parsed JSON', dataToParse);
       // Delete parsed elements of the data before sending to serial
       delete dataToParse.isRemoteControlled;
       // Real proprerties
@@ -275,7 +275,7 @@ io.on("connection", socket => {
       delete dataToParse.frontWheelAngleDeg;
       delete dataToParse.rearWheelAngleDeg;
       delete dataToParse.yawRateDegps;
-      console.log('Parsed JSON after deletion', dataToParse);
+      //console.log('Parsed JSON after deletion', dataToParse);
     }
     catch(e) {
       console.error('Exception', e);
