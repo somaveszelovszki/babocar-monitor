@@ -38,6 +38,10 @@ export default class RefactoredForm extends React.Component {
       this.setState({ formData: dataCopy })
       }
 
+    addFormDataToChart = (dataForwardToParent) => {
+      this.props.addFormDataToChart(dataForwardToParent)
+    }
+
     updateFormData = (serialData) => {
       //console.log('updateFormData', serialData);
       const formDataToUpdate = {...this.state.formData}
@@ -51,6 +55,13 @@ export default class RefactoredForm extends React.Component {
       if(dataForUpdate.hasOwnProperty('isRemoteControlled')) {
         this.props.forwardisRemoteControlled(dataForUpdate.isRemoteControlled)
       }
+
+      // Pass checked fields to the chart
+      let checkedData = Object.entries(dataForUpdate).filter(field => this.state.checkedFields.includes(field[0]));
+      if(checkedData.length > 0) {
+        this.addFormDataToChart(checkedData)
+      }
+
       this.setState({ formData: dataForUpdate })
     }
 
@@ -107,10 +118,45 @@ export default class RefactoredForm extends React.Component {
       const { value, name } = target;
       //const name = target.name;
       console.log('handleCustomFieldChange', event, target, name, value);
-
       this.setState({
         [name]: value
       });
+    }
+
+    handleInputChange(event) {
+      const target = event.target;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      const name = target.name;
+  
+      this.setState({
+        [name]: value
+      });
+    }
+
+    onGraphCheckboxChange(name, value) {
+      let previousCheckedFields = [...this.state.checkedFields]
+      console.log('onGraphCheckboxChange', name, value);
+      console.log('checkedFields', this.state.checkedFields);
+      // New value is true --> check
+      if(value) {
+        // Do not duplicate names in the array
+        if(!this.state.checkedFields.includes(name)) {
+          // Add name to string array
+          previousCheckedFields.push(name)
+          this.setState({ checkedFields: previousCheckedFields })
+          this.props.deleteHistoryFromChart()
+        }
+      }
+      // New value is false --> uncheck
+      else {
+        // Remove name if it is in the array
+        if(this.state.checkedFields.includes(name)) {
+          // Remove name from string array
+          previousCheckedFields = previousCheckedFields.filter(field => field !== name)
+          this.setState({ checkedFields: previousCheckedFields })
+          this.props.deleteHistoryFromChart()
+        }
+      }
     }
 
     render() {
@@ -129,9 +175,11 @@ export default class RefactoredForm extends React.Component {
               key = {'input-'+element.name}
               name={element.name}
               value={element.value}
+              checked={this.state.checkedFields.includes(element.name)}
               onInputChange={this.onInputChange}
               onClickParentHandler={(e) => this.handleClick(e)}
               handleEnter={(e) => this.handleEnter(e)}
+              onGraphCheckboxChange={(name, value) => this.onGraphCheckboxChange(name, value)}
             />
           )
         })
@@ -144,12 +192,13 @@ export default class RefactoredForm extends React.Component {
               <Table striped bordered hover responsive style={{textAlign: 'center', width: '10%'}} size="sm">
                 <thead>
                     <tr>
-                      <td colSpan="2">RobonAut <b>refactored</b> form</td>
+                      <td colSpan="3">RobonAut <b>refactored</b> form</td>
                     </tr>
                 </thead>
                 <tbody>
                     {renderedElements}
                     <tr>
+                      <td></td>
                       <td>
                         <input
                           type="text"
@@ -174,7 +223,7 @@ export default class RefactoredForm extends React.Component {
                       </td>
                     </tr>
                     <tr>
-                      <td colSpan="2">
+                      <td colSpan="3">
                         <Button
                           variant="info"
                           type="submit"
