@@ -259,11 +259,11 @@ export default class GuiApplication extends React.Component {
         this.setState({ mapCoordinates: newCoordinates })
       }
     });
-    this.timerID = setInterval(this.addDataToCharts, 1000)
+    //this.timerID = setInterval(this.addDataToCharts, 1000)
   }
 
   componentWillUnmount() {
-    clearInterval(this.timerID)
+    //clearInterval(this.timerID)
   }
 
   handleClick(e) {
