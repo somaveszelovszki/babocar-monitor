@@ -27,7 +27,7 @@ export default class GuiApplication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isChartEnabled: false,
+      isChartEnabled: true,
       chartData: [],
       counter: 0,
       controllerButtonMode: 'enable',
@@ -64,7 +64,8 @@ export default class GuiApplication extends React.Component {
         "targetSpeedOverrideActive": false
       },
       mapCoordinates: [],
-      isRemoteControlled: false
+      isRemoteControlled: false,
+      checkedFields: []
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
@@ -78,10 +79,12 @@ export default class GuiApplication extends React.Component {
     this.addDataToCharts = this.addDataToCharts.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleIsRemoteControlled = this.handleIsRemoteControlled.bind(this)
+    this.addFormDataToChart = this.addFormDataToChart.bind(this)
+    this.deleteHistoryFromChart = this.deleteHistoryFromChart.bind(this)
   }
 
   handleIsRemoteControlled(isRemoteControlled) {
-    this.setState( { isRemoteControlled: isRemoteControlled }, console.log({ isRemoteControlled }))
+    this.setState({ isRemoteControlled: isRemoteControlled })
   }
 
   updateValue()
@@ -188,6 +191,23 @@ export default class GuiApplication extends React.Component {
           }
         ],
         counter: this.state.counter + 1
+      }))
+      console.log('chartData', this.state.chartData);
+    }
+  }
+
+  addFormDataToChart = (newData) => {
+    console.log('addFormDataToChart', newData);
+    const transformedData = {}
+    newData.forEach(data => {
+      transformedData[data[0]] = data[1]
+    })
+    if(this.state.isChartEnabled) {
+      this.setState(prevState => ({
+        chartData: [
+          ...prevState.chartData, 
+          transformedData
+        ],
       }))
       console.log('chartData', this.state.chartData);
     }
@@ -332,6 +352,10 @@ export default class GuiApplication extends React.Component {
     });
   }
 
+  deleteHistoryFromChart() {
+    this.setState({ chartData: [] })
+  }
+
   render() {
   var recursiveTable = null
   var table = []
@@ -425,7 +449,12 @@ export default class GuiApplication extends React.Component {
             <Col sm={6}>
             <Tabs defaultActiveKey="refactoredFrom" id="uncontrolled-tab-example">
               <Tab eventKey="refactoredFrom" title="Refactored form" style = {TabStyle}>
-                <RefactoredForm socket = {socket} forwardisRemoteControlled = {this.handleIsRemoteControlled} />
+                <RefactoredForm
+                  socket = {socket}
+                  forwardisRemoteControlled = {this.handleIsRemoteControlled}
+                  addFormDataToChart = {this.addFormDataToChart}
+                  deleteHistoryFromChart = {this.deleteHistoryFromChart}
+                />
               </Tab>
               <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
                 <SimpleForm socket = {socket} />
