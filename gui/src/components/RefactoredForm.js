@@ -10,7 +10,11 @@ export default class RefactoredForm extends React.Component {
         formData: {},
         serialData: null,
         customFieldName: '',
-        customFieldValue: ''
+        customFieldValue: '',
+        checkedFields: [
+          'posXm',
+          'frontWheelAngleDeg'
+        ]
       }
       this.handleSubmit = this.handleSubmit.bind(this)
       this.onInputChange = this.onInputChange.bind(this)
@@ -18,6 +22,8 @@ export default class RefactoredForm extends React.Component {
       this.handleEnter = this.handleEnter.bind(this)
       this.updateFormData = this.updateFormData.bind(this)
       this.handleCustomFieldChange = this.handleCustomFieldChange.bind(this)
+      this.onGraphCheckboxChange = this.onGraphCheckboxChange.bind(this)
+      this.addFormDataToChart = this.addFormDataToChart.bind(this)
     }
   
     onInputChange = (input) => {
