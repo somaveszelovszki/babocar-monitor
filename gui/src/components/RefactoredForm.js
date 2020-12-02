@@ -33,15 +33,15 @@ export default class RefactoredForm extends React.Component {
       }
 
     updateFormData = (serialData) => {
-      console.log('updateFormData', serialData);
+      //console.log('updateFormData', serialData);
       const formDataToUpdate = {...this.state.formData}
       let dataForUpdate = {...this.state.serialData}
       const focusedKey = this.state.focusedItem
       if(focusedKey) {
-        console.log('Do not update focused key:', dataForUpdate[focusedKey], formDataToUpdate[focusedKey]);
+        //console.log('Do not update focused key:', dataForUpdate[focusedKey], formDataToUpdate[focusedKey]);
         dataForUpdate[focusedKey] = formDataToUpdate[focusedKey]
       }
-      console.log('dataForUpdate', dataForUpdate);
+      //console.log('dataForUpdate', dataForUpdate);
       if(dataForUpdate.hasOwnProperty('isRemoteControlled')) {
         this.props.forwardisRemoteControlled(dataForUpdate.isRemoteControlled)
       }
@@ -52,7 +52,7 @@ export default class RefactoredForm extends React.Component {
       this.props.socket.on("dataFromSerial", data => {
         try {
           const parsedData = typeof(data) === 'object' ? data : JSON.parse(data)
-          console.log('RefactoredForm on dataFromSerial', typeof(parsedData), parsedData);
+          //console.log('RefactoredForm on dataFromSerial', typeof(parsedData), parsedData);
           this.setState({ serialData: parsedData}, this.updateFormData(parsedData));
         }
         catch(e) {
@@ -90,7 +90,7 @@ export default class RefactoredForm extends React.Component {
       if(customFieldName !== '' && customFieldValue !== '') {
         localData[customFieldName] = customFieldValue
       }
-      console.log('localData', localData)
+      //console.log('localData', localData)
       this.props.socket.emit('dataFromClient', '[P]' + JSON.stringify(localData) + '$')
     }
 
@@ -108,10 +108,8 @@ export default class RefactoredForm extends React.Component {
     }
 
     render() {
-      var renderedElements = null
-      const { focusedItem, serialData, formData } = this.state
-      console.log('Rendering...', formData);
-      var localJson = null
+      var renderedElements
+      const { focusedItem } = this.state
       focusedItem && console.log("Current focused on rendering: " + focusedItem)
       if(this.state.formData) {
         var inputElements = []
@@ -119,6 +117,7 @@ export default class RefactoredForm extends React.Component {
           inputElements.push({name: key, value: value})
         }
         renderedElements = inputElements.map(element => {
+          //console.log('Element', this.state.checkedFields.includes(element.name), element);
           return (
             <InputField
               key = {'input-'+element.name}

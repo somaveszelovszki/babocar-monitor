@@ -74,7 +74,7 @@ export default class SimpleFrom extends React.Component {
       const { focusedItem } = this.state
       var localJson = null
       focusedItem && console.log("Current focused on rendering: " + focusedItem)
-      if(this.state.serialData && focusedItem !== 'frontLineController_P' && this.state.formData['frontLineController_P'] != this.state.serialData['frontLineController_P'])
+      if(this.state.serialData && focusedItem !== 'frontLineController_P' && this.state.formData['frontLineController_P'] !== this.state.serialData['frontLineController_P'])
       {
         console.log(this.state.formData['frontLineController_P'], this.state.serialData['frontLineController_P'])
         localJson = this.state.formData

@@ -13,7 +13,7 @@ export default class InputField extends React.Component {
     }
    componentDidUpdate(prevProps)
    {
-      if(prevProps.value != this.props.value)
+      if(prevProps.value !== this.props.value)
       {
           this.setState({        
             value: this.props.value

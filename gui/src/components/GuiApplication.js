@@ -154,7 +154,6 @@ export default class GuiApplication extends React.Component {
   
   updateFormData(serialData)
   {
-    const { focusedItem } = this.state
     if(typeof(serialData) !== 'object')
     {
       // error handling?
@@ -397,7 +396,8 @@ export default class GuiApplication extends React.Component {
     </Table>
   }
 
-    var renderedElements = null
+    // eslint-disable-next-line no-unused-vars
+    let renderedElements
     if(this.state.formData) {
       var inputElements = []
       for (let [key, value] of Object.entries(this.state.formData)) {
