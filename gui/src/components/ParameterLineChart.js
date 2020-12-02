@@ -1,9 +1,28 @@
 import React from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
+const colors = [
+    '#f51d1d',
+    '#f5821d',
+    '#f5e71d',
+    '#73f51d',
+    '#1df573',
+    '#1df5d5',
+    '#1d9ff5',
+    '#1d3df5',
+    '#851df5',
+    '#e31df5',
+    '#f51d9b',
+    '#f51d53',
+]
+
 export default class ParameterLineChart extends React.Component {
     
     render() {
+
+        //console.log('ParameterLineChart', this.props.data);
+
+        const fieldNames = this.props.data.length > 0 && Object.keys(this.props.data[0])
 
         return (
             <ResponsiveContainer>
@@ -20,9 +39,10 @@ export default class ParameterLineChart extends React.Component {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="speed" stroke="#fc6f03" activeDot={{ r: 8 }} isAnimationActive={false} />
-                    <Line type="monotone" dataKey="angle" stroke="#03fcbe" isAnimationActive={false} />
-                    <Line type="monotone" dataKey="sin" stroke="#037bfc" isAnimationActive={false} />
+                    {fieldNames && fieldNames.map((fieldName, index) => {
+                        const color = index < colors.length ? colors[index] : colors[0]
+                        return <Line type="monotone" dataKey={fieldName} stroke={color} activeDot={{ r: 8 }} isAnimationActive={false} />
+                    })}
                 </LineChart>
             </ResponsiveContainer>
         )

@@ -10,7 +10,11 @@ export default class RefactoredForm extends React.Component {
         formData: {},
         serialData: null,
         customFieldName: '',
-        customFieldValue: ''
+        customFieldValue: '',
+        checkedFields: [
+          'posXm',
+          'frontWheelAngleDeg'
+        ]
       }
       this.handleSubmit = this.handleSubmit.bind(this)
       this.onInputChange = this.onInputChange.bind(this)
@@ -18,6 +22,8 @@ export default class RefactoredForm extends React.Component {
       this.handleEnter = this.handleEnter.bind(this)
       this.updateFormData = this.updateFormData.bind(this)
       this.handleCustomFieldChange = this.handleCustomFieldChange.bind(this)
+      this.onGraphCheckboxChange = this.onGraphCheckboxChange.bind(this)
+      this.addFormDataToChart = this.addFormDataToChart.bind(this)
     }
   
     onInputChange = (input) => {
@@ -32,19 +38,30 @@ export default class RefactoredForm extends React.Component {
       this.setState({ formData: dataCopy })
       }
 
+    addFormDataToChart = (dataForwardToParent) => {
+      this.props.addFormDataToChart(dataForwardToParent)
+    }
+
     updateFormData = (serialData) => {
-      console.log('updateFormData', serialData);
+      //console.log('updateFormData', serialData);
       const formDataToUpdate = {...this.state.formData}
       let dataForUpdate = {...this.state.serialData}
       const focusedKey = this.state.focusedItem
       if(focusedKey) {
-        console.log('Do not update focused key:', dataForUpdate[focusedKey], formDataToUpdate[focusedKey]);
+        //console.log('Do not update focused key:', dataForUpdate[focusedKey], formDataToUpdate[focusedKey]);
         dataForUpdate[focusedKey] = formDataToUpdate[focusedKey]
       }
-      console.log('dataForUpdate', dataForUpdate);
+      //console.log('dataForUpdate', dataForUpdate);
       if(dataForUpdate.hasOwnProperty('isRemoteControlled')) {
         this.props.forwardisRemoteControlled(dataForUpdate.isRemoteControlled)
       }
+
+      // Pass checked fields to the chart
+      let checkedData = Object.entries(dataForUpdate).filter(field => this.state.checkedFields.includes(field[0]));
+      if(checkedData.length > 0) {
+        this.addFormDataToChart(checkedData)
+      }
+
       this.setState({ formData: dataForUpdate })
     }
 
@@ -52,7 +69,7 @@ export default class RefactoredForm extends React.Component {
       this.props.socket.on("dataFromSerial", data => {
         try {
           const parsedData = typeof(data) === 'object' ? data : JSON.parse(data)
-          console.log('RefactoredForm on dataFromSerial', typeof(parsedData), parsedData);
+          //console.log('RefactoredForm on dataFromSerial', typeof(parsedData), parsedData);
           this.setState({ serialData: parsedData}, this.updateFormData(parsedData));
         }
         catch(e) {
@@ -90,7 +107,7 @@ export default class RefactoredForm extends React.Component {
       if(customFieldName !== '' && customFieldValue !== '') {
         localData[customFieldName] = customFieldValue
       }
-      console.log('localData', localData)
+      //console.log('localData', localData)
       this.props.socket.emit('dataFromClient', '[P]' + JSON.stringify(localData) + '$')
     }
 
@@ -101,17 +118,50 @@ export default class RefactoredForm extends React.Component {
       const { value, name } = target;
       //const name = target.name;
       console.log('handleCustomFieldChange', event, target, name, value);
-
       this.setState({
         [name]: value
       });
     }
 
+    handleInputChange(event) {
+      const target = event.target;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      const name = target.name;
+  
+      this.setState({
+        [name]: value
+      });
+    }
+
+    onGraphCheckboxChange(name, value) {
+      let previousCheckedFields = [...this.state.checkedFields]
+      console.log('onGraphCheckboxChange', name, value);
+      console.log('checkedFields', this.state.checkedFields);
+      // New value is true --> check
+      if(value) {
+        // Do not duplicate names in the array
+        if(!this.state.checkedFields.includes(name)) {
+          // Add name to string array
+          previousCheckedFields.push(name)
+          this.setState({ checkedFields: previousCheckedFields })
+          this.props.deleteHistoryFromChart()
+        }
+      }
+      // New value is false --> uncheck
+      else {
+        // Remove name if it is in the array
+        if(this.state.checkedFields.includes(name)) {
+          // Remove name from string array
+          previousCheckedFields = previousCheckedFields.filter(field => field !== name)
+          this.setState({ checkedFields: previousCheckedFields })
+          this.props.deleteHistoryFromChart()
+        }
+      }
+    }
+
     render() {
-      var renderedElements = null
-      const { focusedItem, serialData, formData } = this.state
-      console.log('Rendering...', formData);
-      var localJson = null
+      var renderedElements
+      const { focusedItem } = this.state
       focusedItem && console.log("Current focused on rendering: " + focusedItem)
       if(this.state.formData) {
         var inputElements = []
@@ -119,14 +169,17 @@ export default class RefactoredForm extends React.Component {
           inputElements.push({name: key, value: value})
         }
         renderedElements = inputElements.map(element => {
+          //console.log('Element', this.state.checkedFields.includes(element.name), element);
           return (
             <InputField
               key = {'input-'+element.name}
               name={element.name}
               value={element.value}
+              checked={this.state.checkedFields.includes(element.name)}
               onInputChange={this.onInputChange}
               onClickParentHandler={(e) => this.handleClick(e)}
               handleEnter={(e) => this.handleEnter(e)}
+              onGraphCheckboxChange={(name, value) => this.onGraphCheckboxChange(name, value)}
             />
           )
         })
@@ -139,12 +192,13 @@ export default class RefactoredForm extends React.Component {
               <Table striped bordered hover responsive style={{textAlign: 'center', width: '10%'}} size="sm">
                 <thead>
                     <tr>
-                      <td colSpan="2">RobonAut <b>refactored</b> form</td>
+                      <td colSpan="3">RobonAut <b>refactored</b> form</td>
                     </tr>
                 </thead>
                 <tbody>
                     {renderedElements}
                     <tr>
+                      <td></td>
                       <td>
                         <input
                           type="text"
@@ -169,7 +223,7 @@ export default class RefactoredForm extends React.Component {
                       </td>
                     </tr>
                     <tr>
-                      <td colSpan="2">
+                      <td colSpan="3">
                         <Button
                           variant="info"
                           type="submit"

@@ -33,7 +33,7 @@ class Map extends React.Component {
     
     componentDidUpdate(prevProps)
     {
-        if(prevProps.coordinates.length != this.props.coordinates && this.props.coordinates.length >= 2)
+        if(prevProps.coordinates.length !== this.props.coordinates && this.props.coordinates.length >= 2)
         {
           const canvas = this.refs.canvas
           const ctx = canvas.getContext("2d")
