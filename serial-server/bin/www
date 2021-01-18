@@ -285,6 +285,17 @@ io.on("connection", socket => {
     port.write(dataAsStringToSerial)
   });
 
+  socket.on('webNewSegment', function(data) {
+    const characterFromInteger = String.fromCharCode(data + 'A'.charCodeAt())
+    logWrapper(`webNewSegment: ${data} ---> ${characterFromInteger}`)
+    const dataToParse = {
+      nextSegment: characterFromInteger
+    }
+    const dataAsStringToSerial = `[P]${JSON.stringify(dataToParse)}$`
+    logWrapper(`webNewSegment ---> car: ${dataAsStringToSerial}`)
+    port.write(dataAsStringToSerial)
+  });
+
 });
 
 var firstDataReceived = false
@@ -333,6 +344,14 @@ const handleSerialMessage = (serialMessage) => {
 
     //logWrapper('Serial message without P:' + parsedData)
     io.emit('logFromSerial', parsedData)
+
+    // Embedded system sent reached segment character to serial-server
+    if(parsedData.includes('I]') === true) {
+      if(parsedData.includes('Current segment') === true) {
+        io.emit('serialSegmentReceived', parsedData[parsedData.length - 1])
+      }
+    }
+
     if(serialLogFiles.others) {
       //fs.appendFile(serialLogFiles.others, `${parsedData}\n`);
     }

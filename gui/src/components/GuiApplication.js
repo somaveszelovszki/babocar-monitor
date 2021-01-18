@@ -1,15 +1,11 @@
 import React from "react";
-import { Container, Col, Row, Table, Button, Tabs, Tab } from "react-bootstrap"; // Necessary react-bootstrap components
+import { Container, Col, Row, Button, Tabs, Tab } from "react-bootstrap"; // Necessary react-bootstrap components
 import socketIOClient from "socket.io-client";
-import InputField from './InputField'
 import RefactoredForm from './RefactoredForm'
-import SimpleForm from './SimpleForm'
-import Map from './Map'
-import { getSimpleObjects } from './Recursive'
 import LogViewer from './LogViewer'
 import Header from './Header'
 import ParameterLineChart from './ParameterLineChart'
-import { JsonTree } from 'react-editable-json-tree'
+import Labyrinth from './Labyrinth'
 
 const socket = socketIOClient(process.env.REACT_APP_SERVER_IP_WITH_PORT || "10.42.0.39:3001");
 
@@ -27,7 +23,7 @@ export default class GuiApplication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isChartEnabled: true,
+      isChartEnabled: false,
       chartData: [],
       counter: 0,
       controllerButtonMode: 'enable',
@@ -65,7 +61,8 @@ export default class GuiApplication extends React.Component {
       },
       mapCoordinates: [],
       isRemoteControlled: false,
-      checkedFields: []
+      checkedFields: [],
+      isLabyrinthEnabled: false
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
@@ -81,6 +78,7 @@ export default class GuiApplication extends React.Component {
     this.handleIsRemoteControlled = this.handleIsRemoteControlled.bind(this)
     this.addFormDataToChart = this.addFormDataToChart.bind(this)
     this.deleteHistoryFromChart = this.deleteHistoryFromChart.bind(this)
+    this.toggleLabyrinth = this.toggleLabyrinth.bind(this)
   }
 
   handleIsRemoteControlled(isRemoteControlled) {
@@ -197,12 +195,12 @@ export default class GuiApplication extends React.Component {
   }
 
   addFormDataToChart = (newData) => {
-    console.log('addFormDataToChart', newData);
-    const transformedData = {}
-    newData.forEach(data => {
-      transformedData[data[0]] = data[1]
-    })
     if(this.state.isChartEnabled) {
+      //console.log('addFormDataToChart', newData);
+      const transformedData = {}
+      newData.forEach(data => {
+        transformedData[data[0]] = data[1]
+      })
       this.setState(prevState => ({
         chartData: [
           ...prevState.chartData, 
@@ -356,85 +354,19 @@ export default class GuiApplication extends React.Component {
     this.setState({ chartData: [] })
   }
 
-  render() {
-  var recursiveTable = null
-  var table = []
-  if(typeof this.state.serialData === 'object') {
-    var simpleObjects = getSimpleObjects(this.state.formData, 1)    
-    if(simpleObjects.length > 5) {
-      simpleObjects.forEach(object => {
-        if(object.hasOwnProperty('children') === false) {
-          if(typeof object['value'] == 'boolean') {
-            table.push(<tr key = {'table-'+object['key']}><td>{object['key']}</td><InputField key = {'input-'+object['parent']+object['key']} name={object['key']} value={object['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField></tr>)
-          }
-          else {
-            let input = <InputField key = {'input-'+object['parent']+object['key']} name={object['key']} value={object['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
-            table.push(input)
-          }
-        }
-        else {
-          var parent = <td>{object['parent']}</td>
-          var children = object['children'].map(child => {
-            if(child.hasOwnProperty('children') === false) {
-              var input = <InputField key = {'input-'+object['parent']+child['key']} name={child['key']} value={child['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
-              return input
-            }
-            else {
-              return <tr key = {'table-'+child['parent']}><td>{child['parent']}</td><td>{child['children'].map(child => {
-                if(child.hasOwnProperty('children') === false) {
-                  var input = <InputField key = {'input-'+object['parent']+child['key']} name={child['key']} value={child['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
-                  return input
-                }
-                else {
-                  return <tr key = {'table-'+child['parent']}><td>{child['parent']}</td><td>{child['children'].map(child => {
-                    if(child.hasOwnProperty('children') === false)  {
-                      var input = <InputField key = {'input-'+object['parent']+child['key']} name={child['key']} value={child['value']} onInputChange={({key, value}) => this.onInputChange({key, value})} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
-                      return input
-                    }
-                    else {
-                      return child['children'].map(child => {
-                        return null
-                      })
-                    } 
-                  })}</td></tr>
-                } 
-              })}</td></tr>
-            }
-          })
-          table.push(<tr key = {'table-'+parent}>{parent}{children}</tr>)
-        }
-      })
-    }
-    recursiveTable = <Table striped bordered hover>
-      <thead style = {{textAlign: 'center'}}>
-        <tr>
-          <td colSpan="2">RobonAut form</td>
-        </tr>
-      </thead>
-      <tbody>
-        {table}
-        <tr style = {{textAlign: 'center'}}>
-          <td colSpan="2"><Button variant="info" type="submit" onClick={this.handleSubmit}>Send to serial port</Button></td>
-        </tr>
-      </tbody>
-    </Table>
+  toggleLabyrinth(event) {
+    //console.log('gui toggleLabyrinth', this.state.isLabyrinthEnabled, event.target.checked);
+    this.setState({ isLabyrinthEnabled: event.target.checked })
+    // this.setState(prevState => ({
+    //   isLabyrinthEnabled: !prevState.isLabyrinthEnabled
+    // }));
   }
 
-    // eslint-disable-next-line no-unused-vars
-    let renderedElements
-    if(this.state.formData) {
-      var inputElements = []
-      for (let [key, value] of Object.entries(this.state.formData)) {
-        inputElements.push({name: key, value: value})
-      }
-      renderedElements = inputElements.map(element => {
-        return <InputField key = {'input-'+element.name} name={element.name} value={element.value} onInputChange={this.onInputChange} onClickParentHandler={(e) => this.handleClick(e)} handleEnter={(e) => this.handleEnter(e)}></InputField>
-      })
-    }
-    else {
-      renderedElements = null
-    }
+  toggleChart(event) {
+    this.setState({ isChartEnabled: event.target.checked })
+  }
 
+  render() {
     return (
       <div>
         <Container fluid style = {{ position: 'relative' }}>
@@ -444,7 +376,21 @@ export default class GuiApplication extends React.Component {
             angle = {this.state.formData['car']['pose']['angle_deg']}
             speed = {this.state.formData['car']['speed_mps']}
             controllerButtonMode = {this.state.isRemoteControlled}
+            isLabyrinthEnabled = {this.state.isLabyrinthEnabled}
+            toggleLabyrinth = {(event) => this.toggleLabyrinth(event)}
+            isChartEnabled = {this.state.isChartEnabled}
+            toggleChart = {(event) => this.toggleChart(event)}
           />
+          <Row>
+            <Col style = {{ marginBottom: '10px' }}>
+            {this.state.isLabyrinthEnabled === true && (
+              <Labyrinth
+                size = {22}
+                socket = {socket}
+              />
+            )}
+            </Col>
+          </Row>
         <Row>
             <Col sm={6}>
             <Tabs defaultActiveKey="refactoredFrom" id="uncontrolled-tab-example">
@@ -456,22 +402,11 @@ export default class GuiApplication extends React.Component {
                   deleteHistoryFromChart = {this.deleteHistoryFromChart}
                 />
               </Tab>
-              <Tab eventKey="simpleform" title="Simple form" style = {TabStyle}>
-                <SimpleForm socket = {socket} />
-                {this.state.serialData && <JsonTree data={this.state.serialData} />}
-              </Tab>
-              <Tab eventKey="serialviewer" title="Serial data tree viewer" style = {TabStyle}>
-                {this.state.serialData && <JsonTree data={this.state.serialData} />}
-              </Tab>
-              <Tab eventKey="genericform" title="Generic form" style = {TabStyle}>
-                {recursiveTable && recursiveTable}
-              </Tab>
+              {/*
               <Tab eventKey="map" title="Map" style = {TabStyle}>
-              <Map coordinates = {this.state.mapCoordinates} />
+                <Map coordinates = {this.state.mapCoordinates} />
               </Tab>
-              <Tab eventKey="tree" title="JSON Tree Viewer" style = {TabStyle}>
-              <JsonTree data={this.state.formData} />
-              </Tab>
+              */}
             </Tabs>  
             </Col>
             <Col sm={6}>
@@ -483,17 +418,7 @@ export default class GuiApplication extends React.Component {
           <Row>
             <Col lg={12} style = {{ height: 600 }}>
               <div style = {{ textAlign: 'center' }}>
-                <label>
-                  Enable chart: 
-                <input
-                  name="isChartEnabled"
-                  type="checkbox"
-                  checked={this.state.isChartEnabled}
-                  onChange={this.handleInputChange}
-                  style = {{ marginLeft: '10px' }}
-                />
-                </label>
-                { this.state.isChartEnabled && (
+                {this.state.isChartEnabled && (
                   <Button
                     variant="danger"
                     onClick={() => this.setState({ chartData: [] })}
