@@ -285,6 +285,17 @@ io.on("connection", socket => {
     port.write(dataAsStringToSerial)
   });
 
+  socket.on('webNewSegment', function(data) {
+    const characterFromInteger = String.fromCharCode(data + 'A'.charCodeAt())
+    logWrapper(`webNewSegment: ${data} ---> ${characterFromInteger}`)
+    const dataToParse = {
+      nextSegment: characterFromInteger
+    }
+    const dataAsStringToSerial = `[P]${JSON.stringify(dataToParse)}$`
+    logWrapper(`webNewSegment ---> car: ${dataAsStringToSerial}`)
+    port.write(dataAsStringToSerial)
+  });
+
 });
 
 var firstDataReceived = false
