@@ -24,8 +24,8 @@ export default class Header extends React.Component {
             className="d-inline-block align-top"
           />{' '}
         </Navbar.Brand>
-        <div style = {{color: 'black'}}>
-          Unemployed &amp; Single
+        <div style = {{color: 'black', fontSize: '3rem', fontWeight: 'bold', fontFamily: "Verdana" }}>
+          {this.props.controllerButtonMode === true ? 'Engedélyezés' : 'Irányítás'}
         </div>
         <div style = {{ margin: 10, position: 'absolute', right: 10 }}>
           <StatusBar
@@ -33,6 +33,10 @@ export default class Header extends React.Component {
             posY = {this.props.posY}
             angle = {this.props.angle}
             speed = {this.props.speed}
+            isLabyrinthEnabled = {this.props.isLabyrinthEnabled}
+            toggleLabyrinth = {(event) => this.props.toggleLabyrinth(event)}
+            isChartEnabled = {this.props.isChartEnabled}
+            toggleChart = {(event) => this.props.toggleChart(event)}
           />
         </div>
       </Navbar>
