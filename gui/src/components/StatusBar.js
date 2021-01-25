@@ -11,6 +11,10 @@ export default class StatusBar extends React.Component {
         this.props.toggleChart(event)
     }
 
+    toggleMap(event) {
+        this.props.toggleMap(event)
+    }
+
     render() {
         //console.log('render', this.props.isLabyrinthEnabled);
         return (
@@ -32,6 +36,16 @@ export default class StatusBar extends React.Component {
                     type="checkbox"
                     checked={this.props.isChartEnabled}
                     onChange={(event) => this.toggleChart(event)}
+                    style={{ marginLeft: '10px' }}
+                />
+            </ListGroup.Item>
+            <ListGroup.Item variant = {this.props.isMapEnabled ? "success" : "dark" }>
+                Map
+                <input
+                    name="labyrinth"
+                    type="checkbox"
+                    checked={this.props.isMapEnabled}
+                    onChange={(event) => this.toggleMap(event)}
                     style={{ marginLeft: '10px' }}
                 />
             </ListGroup.Item>
