@@ -133,7 +133,7 @@ export default class Labyrinth extends React.Component {
         console.log('Labyrinth componentDidMount', this.props.size, this.state.sections);
         this.findUnreachedSection()
         this.setState({
-            testTimer: setInterval(this.handleTimerTick, 1000),
+            //testTimer: setInterval(this.handleTimerTick, 1000),
             oneSecondTimer: setInterval(this.handleOneSecondTimer, 1000)
         })
         // Socket handling
@@ -143,7 +143,7 @@ export default class Labyrinth extends React.Component {
     }
 
     componentWillUnmount() {
-        clearInterval(this.state.testTimer)
+        //clearInterval(this.state.testTimer)
         clearInterval(this.state.oneSecondTimer)
     }
 
