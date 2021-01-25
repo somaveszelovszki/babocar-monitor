@@ -37,6 +37,8 @@ export default class Header extends React.Component {
             toggleLabyrinth = {(event) => this.props.toggleLabyrinth(event)}
             isChartEnabled = {this.props.isChartEnabled}
             toggleChart = {(event) => this.props.toggleChart(event)}
+            isMapEnabled = {this.props.isMapEnabled}
+            toggleMap = {(event) => this.props.toggleMap(event)}
           />
         </div>
       </Navbar>

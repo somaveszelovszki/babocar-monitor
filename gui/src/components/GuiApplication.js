@@ -6,6 +6,7 @@ import LogViewer from './LogViewer'
 import Header from './Header'
 import ParameterLineChart from './ParameterLineChart'
 import Labyrinth from './Labyrinth'
+import Map from './Map'
 
 const socket = socketIOClient(process.env.REACT_APP_SERVER_IP_WITH_PORT || "10.42.0.39:3001");
 
@@ -62,7 +63,8 @@ export default class GuiApplication extends React.Component {
       mapCoordinates: [],
       isRemoteControlled: false,
       checkedFields: [],
-      isLabyrinthEnabled: false
+      isLabyrinthEnabled: false,
+      isMapEnabled: false
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
@@ -224,46 +226,34 @@ export default class GuiApplication extends React.Component {
         this.setState({ mapCoordinates: newCoordinates })
       }
     })
-    /*
+    
     socket.on("dataFromSerial", rawData => {
-      console.log('dataFromSerial', typeof(rawData), rawData);
       const data = typeof(rawData) !== 'object' ? JSON.parse(rawData) : rawData;
-    });
-    */
-    /*
-      const updatedData = this.updateFormData(data);
-      const newCoordinate = {
-        x: Math.round(data['car']['pose']['pos_m']['X'] * 100),
-        y: Math.round(data['car']['pose']['pos_m']['Y'] * 100)
-      }
-      const newCoordinates = this.state.mapCoordinates
-      var inArray = false
-      newCoordinates.forEach((element) => {
-        if(Math.floor(element.x) === Math.floor(newCoordinate.x) && Math.floor(element.y) === Math.floor(newCoordinate.y)) {
-          inArray = true
+      if(this.state.isMapEnabled) {
+        const newCoordinate = {
+          x: Math.round(data.posXm * 100),
+          y: Math.round(data.posYm * 100)
         }
-      })
-      if(inArray === false)
-      {
-        if(data.hasOwnProperty('junction')) {
-          newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y), junction: data['junction'] })
+        const newCoordinates = this.state.mapCoordinates
+        var inArray = false
+        newCoordinates.forEach((element) => {
+          if(Math.floor(element.x) === Math.floor(newCoordinate.x) && Math.floor(element.y) === Math.floor(newCoordinate.y)) {
+            inArray = true
+          }
+        })
+        if(inArray === false)
+        {
+          if(data.hasOwnProperty('junction')) {
+            newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y), junction: data['junction'] })
+          }
+          else {
+            newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y) })
+          }
+          console.log('newCoordinates', newCoordinates);
+          this.setState({ mapCoordinates: newCoordinates })
         }
-        else {
-          newCoordinates.push({ x: Math.floor(newCoordinate.x), y: Math.floor(newCoordinate.y) })
-        }
-        this.setState({ serialData: updatedData.serialData, formData: updatedData.formData, mapCoordinates: newCoordinates })
-      }
-      else {
-        this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
       }
     });
-    */
-    /*
-    socket.on("dataFromJSON", data => {
-      const updatedData = this.updateFormData(data);
-      this.setState({ serialData: updatedData.serialData, formData: updatedData.formData })
-    });
-    */
     socket.on("map", data => {
       const newCoordinates = this.state.mapCoordinates
       var inArray = false
@@ -366,6 +356,10 @@ export default class GuiApplication extends React.Component {
     this.setState({ isChartEnabled: event.target.checked })
   }
 
+  toggleMap(event) {
+    this.setState({ isMapEnabled: event.target.checked })
+  }
+
   render() {
     return (
       <div>
@@ -380,6 +374,8 @@ export default class GuiApplication extends React.Component {
             toggleLabyrinth = {(event) => this.toggleLabyrinth(event)}
             isChartEnabled = {this.state.isChartEnabled}
             toggleChart = {(event) => this.toggleChart(event)}
+            isMapEnabled = {this.state.isMapEnabled}
+            toggleMap = {(event) => this.toggleMap(event)}
           />
           <Row>
             <Col style = {{ marginBottom: '10px' }}>
@@ -402,11 +398,11 @@ export default class GuiApplication extends React.Component {
                   deleteHistoryFromChart = {this.deleteHistoryFromChart}
                 />
               </Tab>
-              {/*
+              {this.state.isMapEnabled && (
               <Tab eventKey="map" title="Map" style = {TabStyle}>
                 <Map coordinates = {this.state.mapCoordinates} />
               </Tab>
-              */}
+              )}
             </Tabs>  
             </Col>
             <Col sm={6}>
