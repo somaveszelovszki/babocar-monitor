@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
-import SocketIO from 'socket.io-client';
+import socketIO from 'socket.io-client';
 
 import './style.css';
 import * as utils from './Utils';
@@ -11,7 +11,7 @@ import MapCard from './components/MapCard'
 import ParameterEditorCard from './components/ParameterEditorCard'
 import RaceTrackCardCard from './components/RaceTrackCard';
 
-const socket = SocketIO.connect('http://localhost:3001');
+const socket = socketIO.connect('http://localhost:3001');
 
 socket.emit('subscribe', 'car');
 socket.emit('subscribe', 'log');

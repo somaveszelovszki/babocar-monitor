@@ -26,10 +26,10 @@ function Log({ log }) {
     const border = { borderRight: '1px solid #000000' };
 
     return (
-        <tr class={`bg-${getColor(log.level)}`}>
+        <tr className={`bg-${getColor(log.level)}`}>
             <td style={{ ...border, width: '6rem' }}>{utils.formatDate(new Date(log.timestamp))}</td>
             <td style={{ ...border, width: '3rem' }}>{getText(log.level)}</td>
-            <td class='text-left'>{log.text}</td>
+            <td className='text-left'>{log.text}</td>
         </tr>
     )
 }
@@ -47,10 +47,10 @@ export default function LogCard({ logs, setLogs }) {
                     </Row>
                 </Card.Title>
 
-                <div class='table-responsive text-nowrap' style={{ width: '100%', maxHeight: '700px', overflow: 'scroll' }}>
-                    <Table class='table'>
+                <div className='table-responsive text-nowrap' style={{ width: '100%', maxHeight: '700px', overflow: 'scroll' }}>
+                    <Table className='table'>
                         <tbody>
-                            {logs.length > 0 ? logs.map((log) => (<Log log={log} />)) : 'Log list is empty'}
+                            {logs.length > 0 ? logs.map((log, index) => (<Log log={log} key={index} />)) : <tr key='log-empty'><td>Log list is empty</td></tr>}
                         </tbody>
                     </Table>
                 </div>
