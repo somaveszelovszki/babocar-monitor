@@ -27,7 +27,7 @@ export default function App() {
     React.useEffect(() => {
         socket.on('feed', (json) => {
             console.log(`Received feed: ${json}`);
-            let msg = JSON.parse(json);
+            const msg = JSON.parse(json);
             switch (msg.channel) {
                 case 'car':
                     setCar(msg.car);
@@ -39,7 +39,7 @@ export default function App() {
 
                 case 'params':
                     setParamsIn((paramsIn) => {
-                        let newParams = { ...paramsIn };
+                        const newParams = { ...paramsIn };
                         Object.keys(msg.params).map((key) => newParams[key] = msg.params[key]);
                         return newParams;
                     });

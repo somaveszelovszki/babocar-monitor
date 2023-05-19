@@ -3,16 +3,16 @@
  */
 
 export function formatDate(date) {
-    let hh = String(date.getHours()).padStart(2, '0');
-    let mm = String(date.getMinutes()).padStart(2, '0');
-    let ss = String(date.getSeconds()).padStart(2, '0');
-    let ms = String(date.getMilliseconds()).padEnd(3, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    const ms = String(date.getMilliseconds()).padEnd(3, '0');
 
     return `${hh}:${mm}:${ss}.${ms}`
 }
 
 export function pushFIFO(array, element, limit) {
-    let newArray = [...array, element];
+    const newArray = [...array, element];
     if (newArray.length > limit) {
         newArray.shift();
     }
@@ -20,7 +20,7 @@ export function pushFIFO(array, element, limit) {
 }
 
 export function unshiftFIFO(array, element, limit) {
-    let newArray = [element, ...array];
+    const newArray = [element, ...array];
     if (newArray.length > limit) {
         newArray.pop();
     }

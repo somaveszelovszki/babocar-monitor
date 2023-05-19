@@ -23,7 +23,7 @@ function getText(level) {
 }
 
 function Log({ log }) {
-    let border = { borderRight: '1px solid #000000' };
+    const border = { borderRight: '1px solid #000000' };
 
     return (
         <tr class={`bg-${getColor(log.level)}`}>

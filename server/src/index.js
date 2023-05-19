@@ -88,7 +88,7 @@ setInterval(() => {
         log: {
             timestamp: new Date().toISOString(),
             level: getLogLevel(),
-            text: `Very-very-very-very-very-very-very-very-very-very-very long log message from server #${logIndex}`
+            text: `Log message from server #${logIndex}`
         }
     }));
 
