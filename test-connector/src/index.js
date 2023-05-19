@@ -7,13 +7,13 @@ const socket = socketIO.connect('http://localhost:3001', {
     }
 });
 
-socket.emit('subscribe', 'params');
+socket.emit('subscribe', 'update-params');
 
 socket.on('feed', (json) => {
     console.log(`Received feed: ${json}`);
     const msg = JSON.parse(json);
     switch (msg.channel) {
-        case 'params':
+        case 'update-params':
             updateParams(msg.params);
             break;
 

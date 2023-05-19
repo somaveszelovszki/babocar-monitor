@@ -55,7 +55,7 @@ export default function App() {
 
     React.useEffect(() => {
         socket.emit('send', JSON.stringify({
-            channel: 'params',
+            channel: 'update-params',
             params: paramsOut
         }));
     }, [paramsOut]);
