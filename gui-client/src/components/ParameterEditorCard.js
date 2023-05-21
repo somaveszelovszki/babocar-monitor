@@ -3,7 +3,7 @@ import { Card, Form } from 'react-bootstrap';
 
 function ParameterInput({ name, valueIn, setParamsOut }) {
     const inputRef = React.useRef(null)
-    const [type, _] = React.useState(typeof valueIn);
+    const [type] = React.useState(typeof valueIn);
     const [value, setValue] = React.useState(valueIn);
 
     if (value !== valueIn && document.activeElement !== inputRef.current) {
