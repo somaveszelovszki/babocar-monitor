@@ -22,10 +22,13 @@ socket.on('feed', (json) => {
     }
 });
 
+const SIMULATION_SPEED_MPS = 1;
+const SIMULATION_INTERVAL_MS = 100;
+
 let car = {
-    pos_m: { x: 0, y: 0 },
+    pos_m: { x: 1, y: 0 },
     angle_rad: 0,
-    speed_mps: 0
+    speed_mps: SIMULATION_SPEED_MPS
 };
 
 let logIndex = 0;
@@ -37,16 +40,35 @@ let params = {
 };
 
 setInterval(() => {
-    car.pos_m.x += 0.5;
-    car.pos_m.y += 1.0;
-    car.angle_rad += Math.PI / 10;
-    car.speed_mps += 0.1;
+    broadcastCar();
+}, SIMULATION_INTERVAL_MS);
+
+setInterval(() => {
+    broadcastLog();
+    broadcastParams();
+}, 1000);
+
+function broadcastCar() {
+    const radius = Math.sqrt(car.pos_m.x * car.pos_m.x + car.pos_m.y * car.pos_m.y);
+    const distance = SIMULATION_SPEED_MPS * (SIMULATION_INTERVAL_MS / 1000);
+    const d_angle = distance / radius;
+    const newRadius = radius * 1.001;
+
+    car.angle_rad += d_angle;
+    if (car.angle_rad > 2 * Math.PI) {
+        car.angle_rad -= 2 * Math.PI;
+    }
+
+    car.pos_m.x = newRadius * Math.cos(car.angle_rad);
+    car.pos_m.y = newRadius * Math.sin(car.angle_rad);
 
     socket.emit('send', JSON.stringify({
         channel: 'car',
         car: car
     }));
+}
 
+function broadcastLog() {
     logIndex += 1;
 
     let getLogLevel = () => {
@@ -66,14 +88,16 @@ setInterval(() => {
             text: `Log message from server #${logIndex}`
         }
     }));
+}
 
+function broadcastParams() {
     params.motorCtrl_P += 0.1;
 
     socket.emit('send', JSON.stringify({
         channel: 'params',
         params: params
     }));
-}, 1000);
+}
 
 function updateParams(paramsIn) {
     Object.keys(paramsIn).forEach(key => {
