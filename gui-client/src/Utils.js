@@ -31,15 +31,20 @@ export function scale(value, fromRange, toRange) {
     return toRange[0] + (value - fromRange[0]) / (fromRange[1] - fromRange[0]) * (toRange[1] - toRange[0]);
 }
 
-export function boundingBox2d(positions) {
-    return {
+export function boundingBox2d(positions, padding = 0) {
+    const bbox = {
         x: [Math.min(...positions.map(pos => pos.x)), Math.max(...positions.map(pos => pos.x))],
         y: [Math.min(...positions.map(pos => pos.y)), Math.max(...positions.map(pos => pos.y))]
     };
+
+    return {
+        x: [bbox.x[0] - padding, bbox.x[1] + padding],
+        y: [bbox.y[0] - padding, bbox.y[1] + padding]
+    };
 }
 
-export function squareBoundingBox2d(positions) {
-    const bbox = boundingBox2d(positions);
+export function squareBoundingBox2d(positions, padding = 0) {
+    const bbox = boundingBox2d(positions, padding);
     const mid = { x: (bbox.x[1] + bbox.x[0]) / 2, y: (bbox.y[1] + bbox.y[0]) / 2 };
     const size = Math.max(bbox.x[1] - bbox.x[0], bbox.y[1] - bbox.y[0]);
     return { x: [mid.x - size / 2, mid.x + size / 2], y: [mid.y - size / 2, mid.y + size / 2] };

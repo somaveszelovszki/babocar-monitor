@@ -28,31 +28,40 @@ export default function MapCard({ car }) {
         context.fillStyle = '#FFFFFF';
         context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-        const posBounds = utils.squareBoundingBox2d(positions);
-
-        const padding = 30;
-        const canvasBounds = {
-            x: [padding, context.canvas.width - padding],
-            y: [context.canvas.height - padding, padding]
+        const bbox = utils.squareBoundingBox2d(positions, 1);
+        const grid = {
+            x: [Math.floor(bbox.x[0]), Math.ceil(bbox.x[1])],
+            y: [Math.floor(bbox.y[0]), Math.ceil(bbox.y[1])]
         };
 
         function convert(pos) {
             return {
-                x: utils.scale(pos.x, posBounds.x, canvasBounds.x),
-                y: utils.scale(pos.y, posBounds.y, canvasBounds.y)
+                x: utils.scale(pos.x, bbox.x, [0, context.canvas.width]),
+                y: utils.scale(pos.y, bbox.y, [context.canvas.height, 0])
             };
+        }
+
+        function drawLine(from, to, color) {
+            context.beginPath();
+            context.moveTo(from.x, from.y);
+            context.lineTo(to.x, to.y);
+            context.strokeStyle = color;
+            context.lineWidth = 1;
+            context.stroke();
+        }
+
+        for (let x = grid.x[0]; x <= grid.x[1]; x++) {
+            drawLine(convert({ x: x, y: grid.y[0] }), convert({ x: x, y: grid.y[1] }), 'grey');
+        }
+
+        for (let y = grid.y[0]; y <= grid.y[1]; y++) {
+            drawLine(convert({ x: grid.x[0], y: y }), convert({ x: grid.x[1], y }), 'grey');
         }
 
         let prev = convert(positions[0]);
         positions.forEach(pos => {
             const current = convert(pos);
-            context.beginPath();
-            context.moveTo(prev.x, prev.y);
-            context.lineTo(current.x, current.y);
-            context.strokeStyle = 'red';
-            context.lineWidth = 1;
-            context.stroke();
-
+            drawLine(prev, current, 'red');
             prev = current;
         });
 
