@@ -50,12 +50,24 @@ export default function MapCard({ car }) {
             context.stroke();
         }
 
+        function drawText(text, pos) {
+            context.beginPath();
+            context.font = '18px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'top';
+            context.fillStyle = 'black';
+            context.fillText(text, pos.x, pos.y);
+            context.stroke();
+        }
+
         for (let x = grid.x[0]; x <= grid.x[1]; x++) {
             drawLine(convert({ x: x, y: grid.y[0] }), convert({ x: x, y: grid.y[1] }), 'grey');
+            drawText(x.toString(), convert({ x: x, y: 0 }));
         }
 
         for (let y = grid.y[0]; y <= grid.y[1]; y++) {
             drawLine(convert({ x: grid.x[0], y: y }), convert({ x: grid.x[1], y }), 'grey');
+            drawText(y.toString(), convert({ x: 0, y: y }));
         }
 
         let prev = convert(positions[0]);
