@@ -26,10 +26,10 @@ export default function CarPropertiesCard({ car }) {
             <Card.Body>
                 <Card.Title>Car</Card.Title>
                 <ListGroup>
-                    <Property name="X" unit="m" value={car.pos_m.x.toFixed(2)} index='0' />
-                    <Property name="Y" unit="m" value={car.pos_m.y.toFixed(2)} index='1' />
-                    <Property name="Angle" unit="deg" value={(car.angle_rad * 180 / Math.PI).toFixed(2)} index='2' />
-                    <Property name="Speed" unit="m/s" value={car.speed_mps.toFixed(2)} index='3' />
+                    <Property name="X" unit="m" value={car.pos_m?.x.toFixed(2)} index='0' />
+                    <Property name="Y" unit="m" value={car.pos_m?.y.toFixed(2)} index='1' />
+                    <Property name="Angle" unit="deg" value={car.angle_rad ? (car.angle_rad * 180 / Math.PI).toFixed(2) : null} index='2' />
+                    <Property name="Speed" unit="m/s" value={car.speed_mps?.toFixed(2)} index='3' />
                 </ListGroup>
             </Card.Body>
         </Card>

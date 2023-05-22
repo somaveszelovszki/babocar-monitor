@@ -4,15 +4,19 @@ import { Card } from 'react-bootstrap';
 import * as utils from '../Utils'
 
 export default function MapCard({ car }) {
-    const [positions, setPositions] = React.useState([car.pos_m]);
+    const [positions, setPositions] = React.useState([]);
 
-    if (positions.at(-1) !== car.pos_m) {
+    if (car.pos_m !== null && (positions.length === 0 || positions.at(-1) !== car.pos_m)) {
         setPositions([...positions, car.pos_m]);
     }
 
     const canvasRef = React.useRef(null);
 
     React.useEffect(() => {
+        if (positions.length === 0) {
+            return;
+        }
+
         const context = canvasRef.current.getContext('2d');
 
         const dimensions = contain(
@@ -41,12 +45,12 @@ export default function MapCard({ car }) {
             };
         }
 
-        function drawLine(from, to, color) {
+        function drawLine(from, to, style) {
             context.beginPath();
             context.moveTo(from.x, from.y);
             context.lineTo(to.x, to.y);
-            context.strokeStyle = color;
-            context.lineWidth = 1;
+            context.strokeStyle = style.color;
+            context.lineWidth = style.width;
             context.stroke();
         }
 
@@ -60,20 +64,34 @@ export default function MapCard({ car }) {
             context.stroke();
         }
 
+        function getGridLineStyle(coord) {
+            const highlight = coord % 5 === 0;
+            return {
+                color: highlight ? 'black' : 'grey',
+                width: highlight ? 2 : 1
+            };
+        }
+
+        const showLabel = Math.max(grid.x[1] - grid.x[0], grid.y[1] - grid.y[0]) < 25;
+
         for (let x = grid.x[0]; x <= grid.x[1]; x++) {
-            drawLine(convert({ x: x, y: grid.y[0] }), convert({ x: x, y: grid.y[1] }), 'grey');
-            drawText(x.toString(), convert({ x: x, y: 0 }));
+            drawLine(convert({ x: x, y: grid.y[0] }), convert({ x: x, y: grid.y[1] }), getGridLineStyle(x));
+            if (showLabel) {
+                drawText(x.toString(), convert({ x: x, y: 0 }));
+            }
         }
 
         for (let y = grid.y[0]; y <= grid.y[1]; y++) {
-            drawLine(convert({ x: grid.x[0], y: y }), convert({ x: grid.x[1], y }), 'grey');
-            drawText(y.toString(), convert({ x: 0, y: y }));
+            drawLine(convert({ x: grid.x[0], y: y }), convert({ x: grid.x[1], y }), getGridLineStyle(y));
+            if (showLabel) {
+                drawText(y.toString(), convert({ x: 0, y: y }));
+            }
         }
 
         let prev = convert(positions[0]);
         positions.forEach(pos => {
             const current = convert(pos);
-            drawLine(prev, current, 'red');
+            drawLine(prev, current, { color: 'red', width: 2 });
             prev = current;
         });
 

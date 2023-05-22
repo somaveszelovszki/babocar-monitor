@@ -18,7 +18,7 @@ socket.emit('subscribe', 'log');
 socket.emit('subscribe', 'params');
 
 export default function App() {
-    const [car, setCar] = React.useState({ pos_m: { x: 0, y: 0 }, angle_rad: 0, speed_mps: 0 });
+    const [car, setCar] = React.useState({ pos_m: null, angle_rad: null, speed_mps: null });
     const [isDirectControlEnabled, setDirectControlEnabled] = React.useState(false);
     const [logs, setLogs] = React.useState([]);
     const [paramsIn, setParamsIn] = React.useState({});
