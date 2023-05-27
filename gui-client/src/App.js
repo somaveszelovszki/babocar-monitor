@@ -9,7 +9,7 @@ import Header from './components/Header'
 import LogCard from './components/LogCard'
 import MapCard from './components/MapCard'
 import ParameterEditorCard from './components/ParameterEditorCard'
-import RaceTrackCardCard from './components/RaceTrackCard';
+import RaceTrackCard from './components/RaceTrackCard';
 
 const socket = socketIO.connect('http://localhost:3001');
 
@@ -85,7 +85,7 @@ export default function App() {
                             <Col xl={6} className='order-xs-2 order-xl-1'>
                                 <Row>
                                     <Col>
-                                        <RaceTrackCardCard />
+                                        <RaceTrackCard />
                                     </Col>
                                 </Row>
                                 <Row>
