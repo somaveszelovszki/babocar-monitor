@@ -9,7 +9,7 @@ export default function Header({ isDirectControlEnabled }) {
             <Navbar.Brand href="#home">
                 <img
                     alt=""
-                    src={process.env.PUBLIC_URL + '/img/logo.png'}
+                    src={process.env.PUBLIC_URL + '/img/profile.jpg'}
                     width="75"
                     height="75"
                     className="d-inline-block align-top"
