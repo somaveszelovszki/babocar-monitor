@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "concurrently": "^8.1.0"
+  },
+  "scripts": {
+    "feed-logger": "cd feed-logger && npm start",
+    "feed-readback": "cd feed-readback && npm start",
+    "gui-client": "cd gui-client && npm start",
+    "serial-connector": "cd serial-connector && npm start",
+    "server": "cd server && npm start",
+    "test-connector": "cd test-connector && npm start",
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run gui-client\" \"npm run test-connector\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
