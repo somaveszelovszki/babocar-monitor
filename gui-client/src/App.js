@@ -19,7 +19,6 @@ socket.emit('subscribe', 'params');
 
 export default function App() {
     const [car, setCar] = React.useState({ pos_m: null, angle_rad: null, speed_mps: null });
-    const [isDirectControlEnabled, setDirectControlEnabled] = React.useState(false);
     const [logs, setLogs] = React.useState([]);
     const [paramsIn, setParamsIn] = React.useState({});
     const [paramsOut, setParamsOut] = React.useState({});
@@ -65,7 +64,7 @@ export default function App() {
             <Container fluid>
                 <Row>
                     <Col>
-                        <Header isDirectControlEnabled={isDirectControlEnabled} />
+                        <Header isDirectControlEnabled={car.isRemoteControlled} />
                     </Col>
                 </Row>
                 <Row>

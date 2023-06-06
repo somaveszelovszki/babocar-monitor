@@ -28,7 +28,14 @@ const SIMULATION_INTERVAL_MS = 100;
 let car = {
     pos_m: { x: 1, y: 0 },
     angle_rad: 0,
-    speed_mps: SIMULATION_SPEED_MPS
+    speed_mps: SIMULATION_SPEED_MPS,
+    frontWheelAngle_rad: 0.0,
+    rearWheelAngle_rad: 0.0,
+    line: {
+        actual: { pos_m: 0.0, angle_rad: 0.0 },
+        target: { pos_m: 0.0, angle_rad: 0.0 }
+    },
+    isRemoteControlled: true
 };
 
 let logIndex = 0;

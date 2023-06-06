@@ -115,7 +115,7 @@ function broadcastParameters(paramsStr) {
 }
 
 function stringToCar(str) {
-    const regex = /(\d+),(\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d+),(\d+\.\d+)/g;
+    const regex = /(\d+),(\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d)/g;
     const m = str.matchAll(regex);
 
     return {
@@ -127,6 +127,7 @@ function stringToCar(str) {
         line: {
             actual: { pos_m: m[6] / 1000, angle_rad: m[7] },
             target: { pos_m: m[8] / 1000, angle_rad: m[9] }
-        }
+        },
+        isRemoteControlled: m[10] === '1' ? true : false
     };
 }
