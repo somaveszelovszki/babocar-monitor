@@ -1,5 +1,7 @@
 const socketIO = require("socket.io-client");
 
+const data = require("./data");
+
 const socket = socketIO.connect('http://localhost:3001', {
     cors: {
         origin: "*",
@@ -22,56 +24,35 @@ socket.on('feed', (json) => {
     }
 });
 
-const SIMULATION_SPEED_MPS = 1;
 const SIMULATION_INTERVAL_MS = 100;
-
-let car = {
-    pos_m: { x: 1, y: 0 },
-    angle_rad: 0,
-    speed_mps: SIMULATION_SPEED_MPS,
-    frontWheelAngle_rad: 0.0,
-    rearWheelAngle_rad: 0.0,
-    line: {
-        actual: { pos_m: 0.0, angle_rad: 0.0 },
-        target: { pos_m: 0.0, angle_rad: 0.0 }
-    },
-    isRemoteControlled: true
-};
 
 let logIndex = 0;
 
-let params = {
-    motorCtrl_P: 1.0,
-    isEnabled: false,
-    myName: 'Soma'
-};
-
-setInterval(() => {
-    broadcastCar();
-}, SIMULATION_INTERVAL_MS);
+setInterval(() => broadcastCar(), SIMULATION_INTERVAL_MS);
 
 setInterval(() => {
     broadcastLog();
     broadcastParams();
+    broadcastTrackControlParameters()
 }, 1000);
 
 function broadcastCar() {
-    const radius = Math.sqrt(car.pos_m.x * car.pos_m.x + car.pos_m.y * car.pos_m.y);
-    const distance = SIMULATION_SPEED_MPS * (SIMULATION_INTERVAL_MS / 1000);
+    const radius = Math.sqrt(data.car.pos_m.x * data.car.pos_m.x + data.car.pos_m.y * data.car.pos_m.y);
+    const distance = data.car.speed_mps * (SIMULATION_INTERVAL_MS / 1000);
     const d_angle = distance / radius;
     const newRadius = radius * 1.001;
 
-    car.angle_rad += d_angle;
-    if (car.angle_rad > 2 * Math.PI) {
-        car.angle_rad -= 2 * Math.PI;
+    data.car.angle_rad += d_angle;
+    if (data.car.angle_rad > 2 * Math.PI) {
+        data.car.angle_rad -= 2 * Math.PI;
     }
 
-    car.pos_m.x = newRadius * Math.cos(car.angle_rad);
-    car.pos_m.y = newRadius * Math.sin(car.angle_rad);
+    data.car.pos_m.x = newRadius * Math.cos(data.car.angle_rad);
+    data.car.pos_m.y = newRadius * Math.sin(data.car.angle_rad);
 
     socket.emit('send', JSON.stringify({
         channel: 'car',
-        car: car
+        car: data.car
     }));
 }
 
@@ -92,28 +73,35 @@ function broadcastLog() {
         log: {
             timestamp: new Date().toISOString(),
             level: getLogLevel(),
-            text: `Log message from server #${logIndex}`
+            text: `Log message #${logIndex}`
         }
     }));
 }
 
 function broadcastParams() {
-    params.motorCtrl_P += 0.1;
+    data.params.motorCtrl_P += 0.1;
 
     socket.emit('send', JSON.stringify({
         channel: 'params',
-        params: params
+        params: data.params
+    }));
+}
+
+function broadcastTrackControlParameters() {
+    socket.emit('send', JSON.stringify({
+        channel: 'trackControl',
+        trackControl: data.trackControl
     }));
 }
 
 function updateParams(paramsIn) {
     Object.keys(paramsIn).forEach(key => {
-        params[key] = paramsIn[key];
-        console.log(`Params updated: ${key} = ${params[key]}`);
+        data.params[key] = paramsIn[key];
+        console.log(`Params updated: ${key} = ${data.params[key]}`);
     });
 
     socket.emit('send', JSON.stringify({
         channel: 'params',
-        params: params
+        params: data.params
     }));
 }

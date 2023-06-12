@@ -73,6 +73,14 @@ function handleSerialMessage(msg) {
         case 'P':
             broadcastParameters(data);
             break;
+
+        case 'R':
+            broadcastTrackControlParameters(stringToTrackControlParameters('race', data));
+            break;
+
+        case 'T':
+            broadcastTrackControlParameters(stringToTrackControlParameters('test', data));
+            break;
     }
 }
 
@@ -103,14 +111,21 @@ function broadcastLog(level, text) {
 function broadcastCar(car) {
     socket.emit('send', JSON.stringify({
         channel: 'car',
-        car: JSON.stringify(car)
+        car: car
     }));
 }
 
-function broadcastParameters(paramsStr) {
+function broadcastParameters(params) {
     socket.emit('send', JSON.stringify({
         channel: 'params',
-        params: paramsStr
+        params: params
+    }));
+}
+
+function broadcastTrackControlParameters(control) {
+    socket.emit('send', JSON.stringify({
+        channel: 'trackControl',
+        trackControl: control
     }));
 }
 
@@ -130,4 +145,22 @@ function stringToCar(str) {
         },
         isRemoteControlled: m[10] === '1' ? true : false
     };
+}
+
+function stringToTrackControlParameters(trackType, str) {
+    const controlArray = JSON.parse(str);
+    let control = { type: trackType, sections: [] };
+
+    for (c in controlArray) {
+        control.sections.push({
+            speed_mps: c[0],
+            rampTime_ms: c[1],
+            lineGradient: {
+                from: { pos_m: c[2] / 1000, angle_rad: c[3] },
+                to: { pos_m: c[4] / 1000, angle_rad: c[5] }
+            }
+        });
+    }
+
+    return control;
 }
