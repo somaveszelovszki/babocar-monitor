@@ -47,6 +47,7 @@ const socket = SocketIO.connect('http://localhost:3001', {
 socket.on('feed', handleSocketFeed);
 
 socket.emit('subscribe', 'update-params');
+socket.emit('subscribe', 'update-track-control');
 
 function handleSerialMessage(msg) {
     console.log(`Received serial data: ${msg}`);
@@ -67,7 +68,7 @@ function handleSerialMessage(msg) {
             break;
 
         case 'C':
-            broadcastCar(stringToCar(data));
+            broadcastCar(carFromSerial(data));
             break;
 
         case 'P':
@@ -75,11 +76,11 @@ function handleSerialMessage(msg) {
             break;
 
         case 'R':
-            broadcastTrackControlParameters(stringToTrackControlParameters('race', data));
+            broadcastTrackControl(trackControlFromSerial('race', data));
             break;
 
         case 'T':
-            broadcastTrackControlParameters(stringToTrackControlParameters('test', data));
+            broadcastTrackControl(trackControlFromSerial('test', data));
             break;
     }
 }
@@ -89,7 +90,11 @@ function handleSocketFeed(json) {
     const msg = JSON.parse(json);
     switch (msg.channel) {
         case 'update-params':
-            serialPort.write(JSON.stringify(msg.params));
+            serialPort.write(paramsToSerial(msg.params));
+            break;
+
+        case 'update-track-control':
+            serialPort.write(trackControlToSerial(msg.trackControl));
             break;
 
         default:
@@ -122,14 +127,14 @@ function broadcastParameters(params) {
     }));
 }
 
-function broadcastTrackControlParameters(control) {
+function broadcastTrackControl(control) {
     socket.emit('send', JSON.stringify({
-        channel: 'trackControl',
+        channel: 'track-control',
         trackControl: control
     }));
 }
 
-function stringToCar(str) {
+function carFromSerial(str) {
     const regex = /(\d+),(\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d)/g;
     const m = str.matchAll(regex);
 
@@ -147,20 +152,42 @@ function stringToCar(str) {
     };
 }
 
-function stringToTrackControlParameters(trackType, str) {
-    const controlArray = JSON.parse(str);
+function trackControlFromSerial(trackType, str) {
+    const sections = JSON.parse(str);
     let control = { type: trackType, sections: [] };
 
-    for (c in controlArray) {
+    for (s in sections) {
         control.sections.push({
-            speed_mps: c[0],
-            rampTime_ms: c[1],
+            speed_mps: s[0],
+            rampTime_ms: s[1],
             lineGradient: {
-                from: { pos_m: c[2] / 1000, angle_rad: c[3] },
-                to: { pos_m: c[4] / 1000, angle_rad: c[5] }
+                from: { pos_m: s[2] / 1000, angle_rad: s[3] },
+                to: { pos_m: s[4] / 1000, angle_rad: s[5] }
             }
         });
     }
 
     return control;
+}
+
+function paramsToSerial(params) {
+    return `P:${JSON.stringify(params)}$\r\n`;
+}
+
+function trackControlToSerial(control) {
+    const code = control.type == 'race' ? 'R' : 'T';
+    let sections = [];
+
+    for (s in control.sections) {
+        sections.push([
+            s.speed_mps,
+            s.rampTime_ms,
+            Math.round(s.lineGradient.from.pos_m * 1000),
+            s.lineGradient.from.angle_rad,
+            Math.round(s.lineGradient.to.pos_m * 1000),
+            s.lineGradient.to.angle_rad
+        ]);
+    }
+
+    return `${code}:${JSON.stringify(sections)}$\r\n`;
 }

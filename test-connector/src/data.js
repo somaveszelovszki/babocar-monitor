@@ -16,7 +16,7 @@ let params = {
     motorCtrl_I: 0.002,
 };
 
-const trackControl = {
+let trackControl = {
     type: 'test',
     sections: [
         {

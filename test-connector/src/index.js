@@ -10,6 +10,7 @@ const socket = socketIO.connect('http://localhost:3001', {
 });
 
 socket.emit('subscribe', 'update-params');
+socket.emit('subscribe', 'update-track-control');
 
 socket.on('feed', (json) => {
     console.log(`Received feed: ${json}`);
@@ -17,6 +18,10 @@ socket.on('feed', (json) => {
     switch (msg.channel) {
         case 'update-params':
             updateParams(msg.params);
+            break;
+
+        case 'update-track-control':
+            updateTrackControlParameters(msg.trackControl);
             break;
 
         default:
@@ -89,7 +94,7 @@ function broadcastParams() {
 
 function broadcastTrackControlParameters() {
     socket.emit('send', JSON.stringify({
-        channel: 'trackControl',
+        channel: 'track-control',
         trackControl: data.trackControl
     }));
 }
@@ -104,4 +109,11 @@ function updateParams(paramsIn) {
         channel: 'params',
         params: data.params
     }));
+}
+
+function updateTrackControlParameters(control) {
+    if (control.type == data.trackControl.type) {
+        data.trackControl.sections = control.sections;
+        broadcastTrackControlParameters();
+    }
 }
