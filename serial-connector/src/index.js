@@ -135,20 +135,19 @@ function broadcastTrackControl(control) {
 }
 
 function carFromSerial(str) {
-    const regex = /(\d+),(\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d+),(\d+\.\d+),(\d)/g;
-    const m = str.matchAll(regex);
+    const props = JSON.parse(str);
 
     return {
-        pos_m: { x: m[0] / 1000, y: m[1] / 1000 },
-        angle_rad: m[2],
-        speed_mps: m[3],
-        frontWheelAngle_rad: m[4],
-        rearWheelAngle_rad: m[5],
+        pos_m: { x: props[0] / 1000, y: props[1] / 1000 },
+        angle_deg: props[2],
+        speed_mps: props[3],
+        frontWheelAngle_deg: props[4] * 180.0 / Math.PI,
+        rearWheelAngle_deg: props[5] * 180.0 / Math.PI,
         line: {
-            actual: { pos_m: m[6] / 1000, angle_rad: m[7] },
-            target: { pos_m: m[8] / 1000, angle_rad: m[9] }
+            actual: { pos_m: props[6] / 1000, angle_deg: props[7] * 180.0 / Math.PI },
+            target: { pos_m: props[8] / 1000, angle_deg: props[9] * 180.0 / Math.PI }
         },
-        isRemoteControlled: m[10] === '1' ? true : false
+        isRemoteControlled: props[10] === '1' ? true : false
     };
 }
 
@@ -158,11 +157,14 @@ function trackControlFromSerial(trackType, str) {
 
     for (s in sections) {
         control.sections.push({
-            speed_mps: s[0],
-            rampTime_ms: s[1],
-            lineGradient: {
-                from: { pos_m: s[2] / 1000, angle_rad: s[3] },
-                to: { pos_m: s[4] / 1000, angle_rad: s[5] }
+            name: s[0],
+            control: {
+                speed_mps: s[1],
+                rampTime_ms: s[2],
+                lineGradient: {
+                    from: { pos_m: s[3] / 1000, angle_deg: s[4] * 180.0 / Math.PI },
+                    to: { pos_m: s[5] / 1000, angle_deg: s[6] * 180.0 / Math.PI }
+                }
             }
         });
     }
@@ -180,12 +182,13 @@ function trackControlToSerial(control) {
 
     for (s in control.sections) {
         sections.push([
-            s.speed_mps,
-            s.rampTime_ms,
-            Math.round(s.lineGradient.from.pos_m * 1000),
-            s.lineGradient.from.angle_rad,
-            Math.round(s.lineGradient.to.pos_m * 1000),
-            s.lineGradient.to.angle_rad
+            s.name,
+            s.control.speed_mps,
+            s.control.rampTime_ms,
+            Math.round(s.control.lineGradient.from.pos_m * 1000),
+            s.control.lineGradient.from.angle_deg / 180.0 * Math.PI,
+            Math.round(s.control.lineGradient.to.pos_m * 1000),
+            s.control.lineGradient.to.angle_deg / 180.0 * Math.PI
         ]);
     }
 

@@ -19,7 +19,7 @@ socket.emit('subscribe', 'params');
 socket.emit('subscribe', 'track-control');
 
 export default function App() {
-    const [car, setCar] = React.useState({ pos_m: null, angle_rad: null, speed_mps: null });
+    const [car, setCar] = React.useState({ pos_m: null, angle_deg: null, speed_mps: null });
     const [logs, setLogs] = React.useState([]);
     const [paramsIn, setParamsIn] = React.useState({});
     const [paramsOut, setParamsOut] = React.useState(paramsIn);

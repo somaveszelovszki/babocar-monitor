@@ -61,8 +61,8 @@ function SectionEditor({ sectionIn, setSectionOut, submitted }) {
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.from.angle_rad}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'angle_rad'], v)}
+                    valueIn={sectionIn.control.lineGradient.from.angle_deg}
+                    setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
             <td>
@@ -73,8 +73,8 @@ function SectionEditor({ sectionIn, setSectionOut, submitted }) {
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.to.angle_rad}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'angle_rad'], v)}
+                    valueIn={sectionIn.control.lineGradient.to.angle_deg}
+                    setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
         </tr>
@@ -116,9 +116,9 @@ export default function TrackControlCard({ trackControlIn, setTrackControlOut })
                             <th>Speed [m/s]</th>
                             <th>Ramp time [ms]</th>
                             <th>pos [mm]</th>
-                            <th>angle [rad]</th>
+                            <th>angle [deg]</th>
                             <th>pos [mm]</th>
-                            <th>angle [rad]</th>
+                            <th>angle [deg]</th>
                         </tr>
                         {trackControlIn.sections.map((section, i) =>
                             <SectionEditor

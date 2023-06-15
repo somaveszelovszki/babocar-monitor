@@ -44,16 +44,16 @@ setInterval(() => {
 function broadcastCar() {
     const radius = Math.sqrt(data.car.pos_m.x * data.car.pos_m.x + data.car.pos_m.y * data.car.pos_m.y);
     const distance = data.car.speed_mps * (SIMULATION_INTERVAL_MS / 1000);
-    const d_angle = distance / radius;
+    const d_angle = (distance / radius) * 180.0 / Math.PI;
     const newRadius = radius * 1.001;
 
-    data.car.angle_rad += d_angle;
-    if (data.car.angle_rad > 2 * Math.PI) {
-        data.car.angle_rad -= 2 * Math.PI;
+    data.car.angle_deg += d_angle;
+    if (data.car.angle_deg > 360.0) {
+        data.car.angle_deg -= 360.0;
     }
 
-    data.car.pos_m.x = newRadius * Math.cos(data.car.angle_rad);
-    data.car.pos_m.y = newRadius * Math.sin(data.car.angle_rad);
+    data.car.pos_m.x = newRadius * Math.cos(data.car.angle_deg / 180.0 * Math.PI);
+    data.car.pos_m.y = newRadius * Math.sin(data.car.angle_deg / 180.0 * Math.PI);
 
     socket.emit('send', JSON.stringify({
         channel: 'car',
