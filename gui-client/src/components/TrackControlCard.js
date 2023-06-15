@@ -107,18 +107,20 @@ export default function TrackControlCard({ trackControlIn, setTrackControlOut })
                 <table>
                     <tbody>
                         <tr key={'header1'} style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                            <th colSpan={3}></th>
+                            <th></th>
+                            <th>Speed</th>
+                            <th>Ramp</th>
                             <th colSpan={2}>Line start</th>
                             <th colSpan={2}>Line end</th>
                         </tr>
                         <tr key={'header2'} style={{ textAlign: 'center', fontWeight: 'bold' }}>
                             <th style={{ textAlign: 'left' }}>Section</th>
-                            <th>Speed [m/s]</th>
-                            <th>Ramp time [ms]</th>
-                            <th>pos [mm]</th>
-                            <th>angle [deg]</th>
-                            <th>pos [mm]</th>
-                            <th>angle [deg]</th>
+                            <th>[m/s]</th>
+                            <th>[ms]</th>
+                            <th>[mm]</th>
+                            <th>[deg]</th>
+                            <th>[mm]</th>
+                            <th>[deg]</th>
                         </tr>
                         {trackControlIn.sections.map((section, i) =>
                             <SectionEditor
