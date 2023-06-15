@@ -9,19 +9,22 @@ import Header from './components/Header'
 import LogCard from './components/LogCard'
 import MapCard from './components/MapCard'
 import ParameterEditorCard from './components/ParameterEditorCard'
-import RaceTrackCard from './components/RaceTrackCard';
+import TrackControlCard from './components/TrackControlCard';
 
 const socket = socketIO.connect('http://localhost:3001');
 
 socket.emit('subscribe', 'car');
 socket.emit('subscribe', 'log');
 socket.emit('subscribe', 'params');
+socket.emit('subscribe', 'track-control');
 
 export default function App() {
     const [car, setCar] = React.useState({ pos_m: null, angle_rad: null, speed_mps: null });
     const [logs, setLogs] = React.useState([]);
     const [paramsIn, setParamsIn] = React.useState({});
-    const [paramsOut, setParamsOut] = React.useState({});
+    const [paramsOut, setParamsOut] = React.useState(paramsIn);
+    const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: [] });
+    const [trackControlOut, setTrackControlOut] = React.useState(trackControlIn);
 
     React.useEffect(() => {
         socket.on('feed', (json) => {
@@ -44,6 +47,10 @@ export default function App() {
                     });
                     break;
 
+                case 'track-control':
+                    setTrackControlIn(msg.trackControl);
+                    break;
+
                 default:
                     console.log(`Received feed from unhandled channel: ${msg.channel}`);
             }
@@ -58,6 +65,13 @@ export default function App() {
             params: paramsOut
         }));
     }, [paramsOut]);
+
+    React.useEffect(() => {
+        socket.emit('send', JSON.stringify({
+            channel: 'update-track-control',
+            trackControl: trackControlOut
+        }));
+    }, [trackControlOut]);
 
     return (
         <div className='app'>
@@ -84,7 +98,7 @@ export default function App() {
                             <Col xl={6} className='order-xs-2 order-xl-1'>
                                 <Row>
                                     <Col>
-                                        <RaceTrackCard />
+                                        <TrackControlCard trackControlIn={trackControlIn} setTrackControlOut={setTrackControlOut} />
                                     </Col>
                                 </Row>
                                 <Row>

@@ -21,7 +21,7 @@ socket.on('feed', (json) => {
             break;
 
         case 'update-track-control':
-            updateTrackControlParameters(msg.trackControl);
+            updateTrackControl(msg.trackControl);
             break;
 
         default:
@@ -38,7 +38,7 @@ setInterval(() => broadcastCar(), SIMULATION_INTERVAL_MS);
 setInterval(() => {
     broadcastLog();
     broadcastParams();
-    broadcastTrackControlParameters()
+    broadcastTrackControl()
 }, 1000);
 
 function broadcastCar() {
@@ -92,7 +92,7 @@ function broadcastParams() {
     }));
 }
 
-function broadcastTrackControlParameters() {
+function broadcastTrackControl() {
     socket.emit('send', JSON.stringify({
         channel: 'track-control',
         trackControl: data.trackControl
@@ -111,9 +111,9 @@ function updateParams(paramsIn) {
     }));
 }
 
-function updateTrackControlParameters(control) {
+function updateTrackControl(control) {
     if (control.type == data.trackControl.type) {
         data.trackControl.sections = control.sections;
-        broadcastTrackControlParameters();
+        broadcastTrackControl();
     }
 }

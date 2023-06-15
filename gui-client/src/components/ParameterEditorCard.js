@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 
 function ParameterInput({ name, valueIn, setParamsOut }) {
-    const inputRef = React.useRef(null)
+    const inputRef = React.useRef(null);
     const [type] = React.useState(typeof valueIn);
     const [value, setValue] = React.useState(valueIn);
 
@@ -71,22 +71,24 @@ export default function ParameterEditorCard({ paramsIn, setParamsOut }) {
                     marginRight: margin
                 }}>
                     <tbody>
-                        {Object.keys(paramsIn).map((key, index) =>
-                            <tr key={index} style={{ height: '60px', textAlign: 'left' }}>
+                        {Object.keys(paramsIn).map((key) =>
+                            <tr key={key} style={{ height: '60px', textAlign: 'left' }}>
                                 <td>
                                     {key}
                                 </td>
-                            </tr>)}
+                            </tr>
+                        )}
                     </tbody>
                 </table>
                 <table style={inputStyle}>
                     <tbody>
-                        {Object.keys(paramsIn).map((key, index) =>
-                            <tr key={index} style={{ height: '60px' }}>
+                        {Object.keys(paramsIn).map((key) =>
+                            <tr key={key} style={{ height: '60px' }}>
                                 <td>
                                     <ParameterInput name={key} valueIn={paramsIn[key]} setParamsOut={setParamsOut} />
                                 </td>
-                            </tr>)}
+                            </tr>
+                        )}
                     </tbody>
                 </table>
 

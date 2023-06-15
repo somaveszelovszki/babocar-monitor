@@ -20,19 +20,25 @@ let trackControl = {
     type: 'test',
     sections: [
         {
-            speed_mps: 1.5,
-            rampTime_ms: 800,
-            lineGradient: {
-                from: { pos_m: 0.0, angle_rad: 0.0 },
-                to: { pos_m: 0.0, angle_rad: 0.0 }
+            name: 'fast1',
+            control: {
+                speed_mps: 2.5,
+                rampTime_ms: 800,
+                lineGradient: {
+                    from: { pos_m: 0.00, angle_rad: 0.0 },
+                    to: { pos_m: 0.00, angle_rad: 0.0 }
+                }
             }
         },
         {
-            speed_mps: 1.5,
-            rampTime_ms: 800,
-            lineGradient: {
-                from: { pos_m: 0.0, angle_rad: 0.0 },
-                to: { pos_m: 0.0, angle_rad: 0.0 }
+            name: 'slow1_prepare',
+            control: {
+                speed_mps: 1.5,
+                rampTime_ms: 800,
+                lineGradient: {
+                    from: { pos_m: 0.00, angle_rad: 0.0 },
+                    to: { pos_m: -0.10, angle_rad: 0.0 }
+                }
             }
         }
     ]
