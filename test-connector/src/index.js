@@ -1,31 +1,35 @@
 const socketIO = require("socket.io-client");
+const mqtt = require('mqtt');
 
 const data = require("./data");
 
-const socket = socketIO.connect('http://localhost:3001', {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+const client = mqtt.connect('mqtt://localhost', {
+    clientId: 'test-connector',
+    clean: true,
+    connectTimeout: 4000,
+    reconnectPeriod: 1000,
 });
 
-socket.emit('subscribe', 'update-params');
-socket.emit('subscribe', 'update-track-control');
+client.on('connect', () => {
+    console.log('Connected to MQTT broker');
 
-socket.on('feed', (json) => {
-    console.log(`Received feed: ${json}`);
-    const msg = JSON.parse(json);
-    switch (msg.channel) {
-        case 'update-params':
-            updateParams(msg.params);
+    client.subscribe('/babocar/update-params');
+    client.subscribe('/babocar/update-track-control');
+});
+
+client.on('message', (topic, message) => {
+    console.log(`Received message: ${topic}: ${message}`);
+    switch (topic) {
+        case '/babocar/update-params':
+            updateParams(JSON.parse(message));
             break;
 
-        case 'update-track-control':
-            updateTrackControl(msg.trackControl);
+        case '/babocar/update-track-control':
+            updateTrackControl(JSON.parse(message));
             break;
 
         default:
-            console.log(`Received feed from unhandled channel: ${msg.channel}`);
+            console.log(`Unhandled topic: ${topic}`);
     }
 });
 
@@ -55,14 +59,11 @@ function broadcastCar() {
     data.car.pos_m.x = newRadius * Math.cos(data.car.angle_deg / 180.0 * Math.PI);
     data.car.pos_m.y = newRadius * Math.sin(data.car.angle_deg / 180.0 * Math.PI);
 
-    socket.emit('send', JSON.stringify({
-        channel: 'car',
-        car: data.car
-    }));
+    client.publish('/babocar/car', JSON.stringify(data.car));
 }
 
 function broadcastLog() {
-    logIndex += 1;
+    logIndex++;
 
     let getLogLevel = () => {
         switch (logIndex % 4) {
@@ -73,30 +74,20 @@ function broadcastLog() {
         }
     }
 
-    socket.emit('send', JSON.stringify({
-        channel: 'log',
-        log: {
-            timestamp: new Date().toISOString(),
-            level: getLogLevel(),
-            text: `Log message #${logIndex}`
-        }
+    client.publish('/babocar/log', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        level: getLogLevel(),
+        text: `Log message #${logIndex}`
     }));
 }
 
 function broadcastParams() {
     data.params.motorCtrl_P += 0.1;
-
-    socket.emit('send', JSON.stringify({
-        channel: 'params',
-        params: data.params
-    }));
+    client.publish('/babocar/params', JSON.stringify(data.params));
 }
 
 function broadcastTrackControl() {
-    socket.emit('send', JSON.stringify({
-        channel: 'track-control',
-        trackControl: data.trackControl
-    }));
+    client.publish('/babocar/track-control', JSON.stringify(data.trackControl));
 }
 
 function updateParams(paramsIn) {
@@ -105,10 +96,7 @@ function updateParams(paramsIn) {
         console.log(`Params updated: ${key} = ${data.params[key]}`);
     });
 
-    socket.emit('send', JSON.stringify({
-        channel: 'params',
-        params: data.params
-    }));
+    client.publish('/babocar/params', JSON.stringify(data.params));
 }
 
 function updateTrackControl(control) {
