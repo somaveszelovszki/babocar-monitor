@@ -1,3 +1,4 @@
+import * as _ from 'lodash'
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import socketIO from 'socket.io-client';
@@ -13,11 +14,6 @@ import TrackControlCard from './components/TrackControlCard';
 
 const socket = socketIO.connect('http://localhost:3001');
 
-socket.emit('subscribe', 'car');
-socket.emit('subscribe', 'log');
-socket.emit('subscribe', 'params');
-socket.emit('subscribe', 'track-control');
-
 export default function App() {
     const [car, setCar] = React.useState({ pos_m: null, angle_deg: null, speed_mps: null });
     const [logs, setLogs] = React.useState([]);
@@ -26,52 +22,45 @@ export default function App() {
     const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: [] });
     const [trackControlOut, setTrackControlOut] = React.useState(trackControlIn);
 
-    React.useEffect(() => {
-        socket.on('feed', (json) => {
-            console.log(`Received feed: ${json}`);
-            const msg = JSON.parse(json);
-            switch (msg.channel) {
-                case 'car':
-                    setCar(msg.car);
-                    break;
-
-                case 'log':
-                    setLogs((logs) => utils.unshiftFIFO(logs, msg.log, 200));
-                    break;
-
-                case 'params':
-                    setParamsIn((paramsIn) => {
-                        const newParams = { ...paramsIn };
-                        Object.keys(msg.params).map((key) => newParams[key] = msg.params[key]);
-                        return newParams;
-                    });
-                    break;
-
-                case 'track-control':
-                    setTrackControlIn(msg.trackControl);
-                    break;
-
-                default:
-                    console.log(`Received feed from unhandled channel: ${msg.channel}`);
-            }
-        });
-
-        return () => socket.off('feed');
+    const publish = React.useCallback((topic, data) => {
+        socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
     }, []);
 
     React.useEffect(() => {
-        socket.emit('send', JSON.stringify({
-            channel: 'update-params',
-            params: paramsOut
-        }));
-    }, [paramsOut]);
+        socket.on('message', (json) => {
+            console.log(`Received message: ${json}`);
+            const msg = JSON.parse(json);
+            switch (msg.topic) {
+                case '/babocar/car':
+                    setCar(JSON.parse(msg.message));
+                    break;
 
-    React.useEffect(() => {
-        socket.emit('send', JSON.stringify({
-            channel: 'update-track-control',
-            trackControl: trackControlOut
-        }));
-    }, [trackControlOut]);
+                case '/babocar/log':
+                    setLogs((logs) => utils.unshiftFIFO(logs, JSON.parse(msg.message), 200));
+                    break;
+
+                case '/babocar/params':
+                    setParamsIn((paramsIn) => {
+                        const p = { ...paramsIn };
+                        _.extend(p, JSON.parse(msg.message));
+                        return p;
+                    });
+                    break;
+
+                case '/babocar/track-control':
+                    setTrackControlIn(JSON.parse(msg.message));
+                    break;
+
+                default:
+                    console.log(`Unhandled topic: ${msg.topic}`);
+            }
+        });
+
+        return () => socket.off('message');
+    }, []);
+
+    React.useEffect(() => publish('/babocar/update-params', paramsOut), [paramsOut]);
+    React.useEffect(() => publish('/babocar/update-track-control', trackControlOut), [trackControlOut]);
 
     return (
         <div className='app'>

@@ -1,23 +1,22 @@
-const socketIO = require("socket.io-client");
 const mqtt = require('mqtt');
-
 const data = require("./data");
 
-const client = mqtt.connect('mqtt://localhost', {
+const mqttClient = mqtt.connect('mqtt://localhost', {
     clientId: 'test-connector',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,
 });
 
-client.on('connect', () => {
+mqttClient.on('connect', () => {
     console.log('Connected to MQTT broker');
 
-    client.subscribe('/babocar/update-params');
-    client.subscribe('/babocar/update-track-control');
+    mqttClient.subscribe('/babocar/update-params');
+    mqttClient.subscribe('/babocar/update-track-control');
 });
 
-client.on('message', (topic, message) => {
+mqttClient.on('message', (topic, payload) => {
+    const message = payload.toString();
     console.log(`Received message: ${topic}: ${message}`);
     switch (topic) {
         case '/babocar/update-params':
@@ -59,7 +58,7 @@ function broadcastCar() {
     data.car.pos_m.x = newRadius * Math.cos(data.car.angle_deg / 180.0 * Math.PI);
     data.car.pos_m.y = newRadius * Math.sin(data.car.angle_deg / 180.0 * Math.PI);
 
-    client.publish('/babocar/car', JSON.stringify(data.car));
+    mqttClient.publish('/babocar/car', JSON.stringify(data.car));
 }
 
 function broadcastLog() {
@@ -74,7 +73,7 @@ function broadcastLog() {
         }
     }
 
-    client.publish('/babocar/log', JSON.stringify({
+    mqttClient.publish('/babocar/log', JSON.stringify({
         timestamp: new Date().toISOString(),
         level: getLogLevel(),
         text: `Log message #${logIndex}`
@@ -83,11 +82,11 @@ function broadcastLog() {
 
 function broadcastParams() {
     data.params.motorCtrl_P += 0.1;
-    client.publish('/babocar/params', JSON.stringify(data.params));
+    mqttClient.publish('/babocar/params', JSON.stringify(data.params));
 }
 
 function broadcastTrackControl() {
-    client.publish('/babocar/track-control', JSON.stringify(data.trackControl));
+    mqttClient.publish('/babocar/track-control', JSON.stringify(data.trackControl));
 }
 
 function updateParams(paramsIn) {
@@ -96,7 +95,7 @@ function updateParams(paramsIn) {
         console.log(`Params updated: ${key} = ${data.params[key]}`);
     });
 
-    client.publish('/babocar/params', JSON.stringify(data.params));
+    mqttClient.publish('/babocar/params', JSON.stringify(data.params));
 }
 
 function updateTrackControl(control) {
