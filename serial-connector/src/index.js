@@ -1,5 +1,5 @@
 const SerialPort = require('serialport');
-const SocketIO = require("socket.io-client");
+const mqtt = require('mqtt');
 
 console.log('Serial ports:');
 SerialPort.list().then(ports => ports.forEach(console.log));
@@ -37,14 +37,35 @@ serialPort.on('error', function (error) {
     }
 });
 
-const socket = SocketIO.connect('http://localhost:3001', {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+const mqttClient = mqtt.connect('mqtt://localhost', {
+    clientId: 'test-connector',
+    clean: true,
+    connectTimeout: 4000,
+    reconnectPeriod: 1000,
 });
 
-socket.on('feed', handleSocketFeed);
+mqttClient.on('connect', () => {
+    console.log('Serial-connector connected to MQTT broker');
+
+    mqttClient.subscribe('babocar/update-params');
+    mqttClient.subscribe('babocar/update-track-control');
+});
+
+mqttClient.on('message', (topic, payload) => {
+    const message = JSON.parse(payload.toString());
+    switch (topic) {
+        case 'babocar/update-params':
+            serialPort.write(paramsToSerial(message));
+            break;
+
+        case 'babocar/update-track-control':
+            serialPort.write(trackControlToSerial(message));
+            break;
+
+        default:
+            console.log(`Unhandled topic: ${topic}`);
+    }
+});
 
 socket.emit('subscribe', 'update-params');
 socket.emit('subscribe', 'update-track-control');
@@ -82,23 +103,6 @@ function handleSerialMessage(msg) {
         case 'T':
             broadcastTrackControl(trackControlFromSerial('test', data));
             break;
-    }
-}
-
-function handleSocketFeed(json) {
-    console.log(`Received feed: ${json}`);
-    const msg = JSON.parse(json);
-    switch (msg.channel) {
-        case 'update-params':
-            serialPort.write(paramsToSerial(msg.params));
-            break;
-
-        case 'update-track-control':
-            serialPort.write(trackControlToSerial(msg.trackControl));
-            break;
-
-        default:
-            console.log(`Received feed from unhandled channel: ${msg.channel}`);
     }
 }
 

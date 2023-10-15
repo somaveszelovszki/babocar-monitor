@@ -16,15 +16,14 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (topic, payload) => {
-    const message = payload.toString();
-    console.log(`Received message: ${topic}: ${message}`);
+    const message = JSON.parse(payload.toString());
     switch (topic) {
         case 'babocar/update-params':
-            updateParams(JSON.parse(message));
+            updateParams(message);
             break;
 
         case 'babocar/update-track-control':
-            updateTrackControl(JSON.parse(message));
+            updateTrackControl(message);
             break;
 
         default:
