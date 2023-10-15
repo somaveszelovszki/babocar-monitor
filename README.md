@@ -30,11 +30,11 @@ Connects to the embedded control unit via serial port and propagates messages be
 
 A simple tool for saving the messages of all topics to a file. This file can later be replayed.
 
-## Feed readback
+## Feed readback connector
 
 Reads back a previously saved feed to reproduce the events.
 
-## Test connector
+## Simulator connector
 
 Simulates a real moving car. This is a testing tool for the GUI client.
 
