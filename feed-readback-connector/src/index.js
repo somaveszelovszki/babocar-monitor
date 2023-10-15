@@ -10,7 +10,7 @@ if (!args.file) {
 }
 
 const mqttClient = mqtt.connect('mqtt://localhost', {
-    clientId: 'feed-readback',
+    clientId: 'feed-readback-connector',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,

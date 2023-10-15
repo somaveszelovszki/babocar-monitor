@@ -58,8 +58,8 @@ export default function App() {
         return () => socket.off('message');
     }, []);
 
-    React.useEffect(() => publish('babocar/update-params', paramsOut), [paramsOut]);
-    React.useEffect(() => publish('babocar/update-track-control', trackControlOut), [trackControlOut]);
+    React.useEffect(() => publish('babocar/update-params', paramsOut), [paramsOut, publish]);
+    React.useEffect(() => publish('babocar/update-track-control', trackControlOut), [trackControlOut, publish]);
 
     return (
         <div className='app'>

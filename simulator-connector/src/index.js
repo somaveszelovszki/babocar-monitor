@@ -2,7 +2,7 @@ const mqtt = require('mqtt');
 const data = require("./data");
 
 const mqttClient = mqtt.connect('mqtt://localhost', {
-    clientId: 'test-connector',
+    clientId: 'simulator-connector',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,

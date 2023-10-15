@@ -38,7 +38,7 @@ serialPort.on('error', function (error) {
 });
 
 const mqttClient = mqtt.connect('mqtt://localhost', {
-    clientId: 'test-connector',
+    clientId: 'simulator-connector',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,
