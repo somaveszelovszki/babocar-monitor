@@ -7,11 +7,11 @@
     "feed-readback-connector": "cd feed-readback-connector && npm start --",
     "gui-client": "cd gui-client && npm start",
     "serial-connector": "cd serial-connector && npm start",
-    "server": "cd server && npm start",
+    "mqtt-socket": "cd mqtt-socket && npm start",
     "simulator-connector": "cd simulator-connector && npm start",
-    "simulate": "concurrently --kill-others \"npm run server\" \"npm run gui-client\" \"npm run feed-logger\" \"npm run simulator-connector\"",
-    "readback": "concurrently --kill-others --passthrough-arguments \"npm run server\" \"npm run gui-client\" \"npm run feed-readback-connector -- {@}\"",
-    "start": "concurrently --kill-others \"npm run server\" \"npm run gui-client\" \"npm run feed-logger\" \"npm run serial-connector\"",
+    "simulate": "concurrently --kill-others \"npm run mqtt-socket\" \"npm run gui-client\" \"npm run feed-logger\" \"npm run simulator-connector\"",
+    "readback": "concurrently --kill-others --passthrough-arguments \"npm run mqtt-socket\" \"npm run gui-client\" \"npm run feed-readback-connector -- {@}\"",
+    "start": "concurrently --kill-others \"npm run mqtt-socket\" \"npm run gui-client\" \"npm run feed-logger\" \"npm run serial-connector\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

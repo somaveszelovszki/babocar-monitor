@@ -18,7 +18,7 @@ const io = socketIO(server, {
 });
 
 const mqttClient = mqtt.connect('mqtt://localhost', {
-    clientId: 'server',
+    clientId: 'mqtt-socket',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,
