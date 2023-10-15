@@ -1,13 +1,19 @@
 const fs = require('fs');
-const socketIO = require("socket.io-client");
+const mqtt = require('mqtt');
 
-const socket = socketIO.connect('http://localhost:3001', {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+const mqttClient = mqtt.connect('mqtt://localhost', {
+    clientId: 'feed-logger',
+    clean: true,
+    connectTimeout: 4000,
+    reconnectPeriod: 1000,
 });
 
-let stream = fs.createWriteStream(`babocar_${new Date().toISOString()}.feed`);
-socket.emit('subscribe', '*');
-socket.on('feed', (msg) => stream.write(`${JSON.stringify({ timestamp: new Date().toISOString(), message: msg })}\n`));
+const stream = fs.createWriteStream(`babocar_${new Date().toISOString()}.feed`);
+
+mqttClient.on('connect', () => {
+    console.log('Feed-logger connected to MQTT broker');
+    mqttClient.subscribe('babocar/#');
+});
+
+mqttClient.on('message', (topic, payload) =>
+    stream.write(`${JSON.stringify({ timestamp: new Date().toISOString(), topic, message: payload.toString() })}\n`));

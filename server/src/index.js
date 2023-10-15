@@ -25,17 +25,16 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
 });
 
 mqttClient.on('connect', () => {
-    console.log('Connected to MQTT broker');
+    console.log('Server connected to MQTT broker');
 
-    mqttClient.subscribe('/babocar/car');
-    mqttClient.subscribe('/babocar/log');
-    mqttClient.subscribe('/babocar/params');
-    mqttClient.subscribe('/babocar/track-control');
+    mqttClient.subscribe('babocar/car');
+    mqttClient.subscribe('babocar/log');
+    mqttClient.subscribe('babocar/params');
+    mqttClient.subscribe('babocar/track-control');
 });
 
 mqttClient.on('message', (topic, payload) => {
     const message = payload.toString();
-    console.log(`Broadcasting message: ${topic}: ${message}`);
     io && io.emit('message', JSON.stringify({ topic, message }));
 });
 
@@ -44,7 +43,6 @@ io.on('connection', (client) => {
 
     client.on('publish', function (message) {
         const msg = JSON.parse(message);
-        console.log(`Publishing message: ${msg.topic}: ${msg.message}`);
         mqttClient && mqttClient.publish(msg.topic, msg.message);
     });
 

@@ -11,6 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "socket.io-client": "^4.6.1"
+    "mqtt": "^5.1.2"
   }
 }

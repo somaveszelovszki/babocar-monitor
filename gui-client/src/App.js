@@ -28,18 +28,17 @@ export default function App() {
 
     React.useEffect(() => {
         socket.on('message', (json) => {
-            console.log(`Received message: ${json}`);
             const msg = JSON.parse(json);
             switch (msg.topic) {
-                case '/babocar/car':
+                case 'babocar/car':
                     setCar(JSON.parse(msg.message));
                     break;
 
-                case '/babocar/log':
+                case 'babocar/log':
                     setLogs((logs) => utils.unshiftFIFO(logs, JSON.parse(msg.message), 200));
                     break;
 
-                case '/babocar/params':
+                case 'babocar/params':
                     setParamsIn((paramsIn) => {
                         const p = { ...paramsIn };
                         _.extend(p, JSON.parse(msg.message));
@@ -47,7 +46,7 @@ export default function App() {
                     });
                     break;
 
-                case '/babocar/track-control':
+                case 'babocar/track-control':
                     setTrackControlIn(JSON.parse(msg.message));
                     break;
 
@@ -59,8 +58,8 @@ export default function App() {
         return () => socket.off('message');
     }, []);
 
-    React.useEffect(() => publish('/babocar/update-params', paramsOut), [paramsOut]);
-    React.useEffect(() => publish('/babocar/update-track-control', trackControlOut), [trackControlOut]);
+    React.useEffect(() => publish('babocar/update-params', paramsOut), [paramsOut]);
+    React.useEffect(() => publish('babocar/update-track-control', trackControlOut), [trackControlOut]);
 
     return (
         <div className='app'>
