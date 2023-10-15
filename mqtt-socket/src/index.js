@@ -26,11 +26,7 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
 
 mqttClient.on('connect', () => {
     console.log('Server connected to MQTT broker');
-
-    mqttClient.subscribe('babocar/car');
-    mqttClient.subscribe('babocar/log');
-    mqttClient.subscribe('babocar/params');
-    mqttClient.subscribe('babocar/track-control');
+    mqttClient.subscribe('babocar/#');
 });
 
 mqttClient.on('message', (topic, payload) => {

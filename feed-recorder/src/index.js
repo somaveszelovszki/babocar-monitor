@@ -1,17 +1,23 @@
 const fs = require('fs');
 const mqtt = require('mqtt');
 
+const RECORDINGS_DIR = '../recordings';
+
 const mqttClient = mqtt.connect('mqtt://localhost', {
-    clientId: 'feed-logger',
+    clientId: 'feed-recorder',
     clean: true,
     connectTimeout: 4000,
     reconnectPeriod: 1000,
 });
 
-const stream = fs.createWriteStream(`babocar_${new Date().toISOString()}.feed`);
+if (!fs.existsSync(RECORDINGS_DIR)) {
+    fs.mkdirSync(RECORDINGS_DIR);
+}
+
+const stream = fs.createWriteStream(`${RECORDINGS_DIR}/babocar_${new Date().toISOString()}.feed`);
 
 mqttClient.on('connect', () => {
-    console.log('Feed-logger connected to MQTT broker');
+    console.log('Feed-recorder connected to MQTT broker');
     mqttClient.subscribe('babocar/#');
 });
 
