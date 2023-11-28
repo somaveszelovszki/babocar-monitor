@@ -2,7 +2,8 @@ const { SerialPort } = require('serialport');
 const mqtt = require('mqtt');
 
 SerialPort.list().then(ports => {
-    console.log(`Serial ports: ${JSON.stringify(ports)}`);
+    console.log('Serial ports:');
+    ports.forEach(port => console.log(port));
 });
 
 const SERIAL_PORT_PATH = '/dev/ttyAMA0'
@@ -22,19 +23,16 @@ serialPort.on('open', function () {
 
 let serialData = '';
 serialPort.on('data', function (data) {
-    serialData += data;
-    const delimiter = data.indexOf('$');
+    serialData += data.toString();
+    const delimiter = serialData.indexOf('\n');
     if (delimiter !== -1) {
-        handleSerialMessage(serialData.substring(0, delimiter).replace('\r', '').replace('\n', ''));
+        handleSerialMessage(serialData.substring(0, delimiter).replace('\n', ''));
         serialData = serialData.substring(delimiter + 1);
     }
 });
 
 serialPort.on('error', function (error) {
     console.log(`Error: ${error.message}`);
-    if (error.message.includes('busy') === true || error.message.includes('no device') === true) {
-        SerialPort.list().then(ports => ports.forEach(console.log));
-    }
 });
 
 const mqttClient = mqtt.connect('mqtt://localhost', {
@@ -68,7 +66,6 @@ mqttClient.on('message', (topic, payload) => {
 });
 
 function handleSerialMessage(msg) {
-    console.log(`Received serial data: ${msg}`);
     const delimiter = msg.indexOf(':');
     if (delimiter === -1) {
         console.log(`Error: serial message does not contain match expected format: ${msg}`);
@@ -90,7 +87,7 @@ function handleSerialMessage(msg) {
             break;
 
         case 'P':
-            broadcastParameters(data);
+            broadcastParams(data);
             break;
 
         case 'R':
@@ -104,35 +101,23 @@ function handleSerialMessage(msg) {
 }
 
 function broadcastLog(level, text) {
-    socket.emit('send', JSON.stringify({
-        channel: 'log',
-        log: {
-            timestamp: new Date().toISOString(),
-            level: level,
-            text: text
-        }
+    mqttClient.publish('babocar/log', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        level,
+        text
     }));
 }
 
 function broadcastCar(car) {
-    socket.emit('send', JSON.stringify({
-        channel: 'car',
-        car: car
-    }));
+    mqttClient.publish('babocar/car', JSON.stringify(car));
 }
 
-function broadcastParameters(params) {
-    socket.emit('send', JSON.stringify({
-        channel: 'params',
-        params: params
-    }));
+function broadcastParams(params) {
+    mqttClient.publish('babocar/params', JSON.stringify(params));
 }
 
-function broadcastTrackControl(control) {
-    socket.emit('send', JSON.stringify({
-        channel: 'track-control',
-        trackControl: control
-    }));
+function broadcastTrackControl(trackControl) {
+    mqttClient.publish('babocar/track-control', JSON.stringify(trackControl));
 }
 
 function carFromSerial(str) {

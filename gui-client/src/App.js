@@ -58,8 +58,17 @@ export default function App() {
         return () => socket.off('message');
     }, []);
 
-    React.useEffect(() => publish('babocar/update-params', paramsOut), [paramsOut, publish]);
-    React.useEffect(() => publish('babocar/update-track-control', trackControlOut), [trackControlOut, publish]);
+    React.useEffect(() => {
+        if (!_.isEmpty(paramsOut)) {
+            publish('babocar/update-params', paramsOut);
+        }
+    }, [paramsOut, publish]);
+
+    React.useEffect(() => {
+        if (trackControlOut.type && !_.isEmpty(trackControlOut.sections)) {
+            publish('babocar/update-track-control', trackControlOut);
+        }
+    }, [trackControlOut, publish]);
 
     return (
         <div className='app'>
