@@ -1,20 +1,20 @@
-const SerialPort = require('serialport');
+const { SerialPort } = require('serialport');
 const mqtt = require('mqtt');
 
-console.log('Serial ports:');
-SerialPort.list().then(ports => ports.forEach(console.log));
+SerialPort.list().then(ports => {
+    console.log(`Serial ports: ${JSON.stringify(ports)}`);
+});
 
 const SERIAL_PORT_PATH = '/dev/ttyAMA0'
 
-var serialPort = new SerialPort(SERIAL_PORT_PATH,
-    options = {
-        baudRate: 115200,
-        dataBits: 8,
-        parity: 'none',
-        stopBits: 1,
-        flowControl: false
-    }
-);
+const serialPort = new SerialPort({
+    path: SERIAL_PORT_PATH,
+    baudRate: 115200,
+    dataBits: 8,
+    parity: 'none',
+    stopBits: 1,
+    flowControl: false
+});
 
 serialPort.on('open', function () {
     console.log(`Serial port opened: ${SERIAL_PORT_PATH}`);
@@ -66,9 +66,6 @@ mqttClient.on('message', (topic, payload) => {
             console.log(`Unhandled topic: ${topic}`);
     }
 });
-
-socket.emit('subscribe', 'update-params');
-socket.emit('subscribe', 'update-track-control');
 
 function handleSerialMessage(msg) {
     console.log(`Received serial data: ${msg}`);
