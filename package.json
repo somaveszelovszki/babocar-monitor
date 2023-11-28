@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "concurrently": "^8.1.0"
+    "concurrently": "^8.2.2"
   },
   "scripts": {
     "feed-recorder": "cd feed-recorder && npm start",
