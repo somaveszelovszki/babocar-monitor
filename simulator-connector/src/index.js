@@ -18,8 +18,16 @@ mqttClient.on('connect', () => {
 mqttClient.on('message', (topic, payload) => {
     const message = JSON.parse(payload.toString());
     switch (topic) {
+        case 'babocar/request-params':
+            broadcastParams();
+            break;
+
         case 'babocar/update-params':
             updateParams(message);
+            break;
+
+        case 'babocar/request-track-control':
+            broadcastTrackControl();
             break;
 
         case 'babocar/update-track-control':
@@ -32,16 +40,10 @@ mqttClient.on('message', (topic, payload) => {
 });
 
 const SIMULATION_INTERVAL_MS = 100;
-
-let logIndex = 0;
+const LOG_INTERVAL_MS = 1000;
 
 setInterval(() => broadcastCar(), SIMULATION_INTERVAL_MS);
-
-setInterval(() => {
-    broadcastLog();
-    broadcastParams();
-    broadcastTrackControl()
-}, 1000);
+setInterval(() => broadcastLog(), LOG_INTERVAL_MS);
 
 function broadcastCar() {
     const radius = Math.sqrt(data.car.pos_m.x * data.car.pos_m.x + data.car.pos_m.y * data.car.pos_m.y);
@@ -60,6 +62,7 @@ function broadcastCar() {
     mqttClient.publish('babocar/car', JSON.stringify(data.car));
 }
 
+let logIndex = 0;
 function broadcastLog() {
     logIndex++;
 

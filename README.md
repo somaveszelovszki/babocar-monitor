@@ -3,14 +3,16 @@
 The test suite is designed to be running on a Raspberry Pi on the car platform.
 All the connected nodes are communicating through an MQTT broker using topics, to which the clients subscribe.
 
-| Topic                        | Description                                                         |
-| -----------------------------| ------------------------------------------------------------------- |
-| babocar/car                  | Car information (position, speed, line control information, etc...) |
-| babocar/log                  | Log messages from the firmware                                      |
-| babocar/params               | Modifiable firmware parameters                                      |
-| babocar/update-params        | Request to update firmware parameters                               |
-| babocar/track-control        | Modifiable track control parameters                                 |
-| babocar/update-track-control | Request to update track control parameters                          |
+| Topic                         | Description                                                         |
+| ----------------------------- | ------------------------------------------------------------------- |
+| babocar/car                   | Car information (position, speed, line control information, etc...) |
+| babocar/log                   | Log messages from the firmware                                      |
+| babocar/params                | Modifiable firmware parameters                                      |
+| babocar/request-params        | Request parameters                                                  |
+| babocar/update-params         | Request to update firmware parameters                               |
+| babocar/track-control         | Modifiable track control parameters                                 |
+| babocar/request-track-control | Request track control parameters                                    |
+| babocar/update-track-control  | Request to update track control parameters                          |
 
 # Running the client
 

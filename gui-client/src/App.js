@@ -59,6 +59,11 @@ export default function App() {
     }, []);
 
     React.useEffect(() => {
+        publish('babocar/request-params', {});
+        publish('babocar/request-track-control', {});
+    }, [publish]);
+
+    React.useEffect(() => {
         if (!_.isEmpty(paramsOut)) {
             publish('babocar/update-params', paramsOut);
         }

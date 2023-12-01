@@ -39,7 +39,7 @@ io.on('connection', (client) => {
 
     client.on('publish', function (message) {
         const msg = JSON.parse(message);
-        mqttClient && mqttClient.publish(msg.topic, msg.message);
+        mqttClient.publish(msg.topic, msg.message);
     });
 
     client.on('disconnect', () => {
