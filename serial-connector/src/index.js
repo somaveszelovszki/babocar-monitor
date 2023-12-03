@@ -153,7 +153,7 @@ function carFromSerial(str) {
 
     return {
         pos_m: { x: props[0] / 1000, y: props[1] / 1000 },
-        angle_deg: props[2],
+        angle_deg: radToDeg(props[2]),
         speed_mps: props[3],
         frontWheelAngle_deg: radToDeg(props[4]),
         rearWheelAngle_deg: radToDeg(props[5]),
@@ -166,7 +166,7 @@ function carFromSerial(str) {
 }
 
 function paramsFromSerial(str) {
-    return str;
+    return JSON.parse(str);
 }
 
 function paramsToSerial(params) {
