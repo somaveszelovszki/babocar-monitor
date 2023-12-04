@@ -21,8 +21,9 @@ function ParameterInput({ valueIn, setValueOut, submitted }) {
     );
 }
 
-function SectionEditor({ name, sectionIn, setSectionOut, submitted }) {
+function SectionEditor({ name, sectionIn, sendTrackControl }) {
     const [section, setSection] = React.useState(sectionIn);
+    const [submitted, setSubmitted] = React.useState(true);
 
     if (!_.isEqual(section, sectionIn) && submitted) {
         setSection({ ...sectionIn });
@@ -31,9 +32,9 @@ function SectionEditor({ name, sectionIn, setSectionOut, submitted }) {
     const setSectionParam = (path, param) => {
         const newSection = { ...section };
         const lastKey = path.pop();
-        path.reduce((obj, key) => obj[key], newSection.control)[lastKey] = param;
+        path.reduce((obj, key) => obj[key], newSection)[lastKey] = param;
         setSection(newSection);
-        setSectionOut(newSection);
+        setSubmitted(false);
     }
 
     return (
@@ -77,30 +78,23 @@ function SectionEditor({ name, sectionIn, setSectionOut, submitted }) {
                     setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
+            <td>
+                <Button variant="info" disabled={submitted} onClick={() => {
+                    sendTrackControl({ name, control: section });
+                    setSubmitted(true);
+                }}>Send</Button>
+            </td>
         </tr>
     );
 }
 
-export default function TrackControlCard({ trackControlIn, setTrackControlOut }) {
-    const [trackControl, setTrackControl] = React.useState(trackControlIn);
-    const [submitted, setSubmitted] = React.useState(true);
-
-    if (!_.isEqual(trackControl, trackControlIn) && submitted) {
-        setTrackControl({ ...trackControlIn });
-    }
-
+export default function TrackControlCard({ trackControl, sendTrackControl }) {
     return (
         <Card>
             <Card.Body>
                 <Card.Title>
                     <Row style={{ paddingLeft: '1rem' }}>
-                        <Col>{`Track control: ${trackControl.type ? trackControl.type : 'no'} track`}</Col>
-                        <Col>
-                            <Button variant="info" disabled={submitted} onClick={() => {
-                                setTrackControlOut({ ...trackControl });
-                                setSubmitted(true);
-                            }}>Send</Button>
-                        </Col>
+                        <Col>{`Track control: ${trackControl.type ?? 'no'} track`}</Col>
                     </Row>
                 </Card.Title>
 
@@ -122,18 +116,13 @@ export default function TrackControlCard({ trackControlIn, setTrackControlOut })
                             <th>[mm]</th>
                             <th>[deg]</th>
                         </tr>
-                        {Object.keys(trackControlIn.sections).map((sectionName, i) => {
+                        {Object.keys(trackControl.sections).map((sectionName, i) => {
                             return <SectionEditor
                                 key={i}
                                 name={sectionName}
-                                sectionIn={trackControlIn.sections[sectionName]}
-                                setSectionOut={(s) => {
-                                    const newTrackControl = { ...trackControl };
-                                    newTrackControl.sections[i] = s;
-                                    setTrackControl(newTrackControl);
-                                    setSubmitted(false);
-                                }}
-                                submitted={submitted} />}
+                                sectionIn={trackControl.sections[sectionName]}
+                                sendTrackControl={sendTrackControl} />
+                            }
                         )}
                     </tbody>
                 </table>

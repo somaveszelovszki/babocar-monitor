@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 
-function ParameterInput({ name, valueIn, setParamsOut }) {
+function ParameterInput({ name, valueIn, sendParams }) {
     const inputRef = React.useRef(null);
     const [type] = React.useState(typeof valueIn);
     const [value, setValue] = React.useState(valueIn);
@@ -15,7 +15,7 @@ function ParameterInput({ name, valueIn, setParamsOut }) {
             return (
                 <input type='checkbox' ref={inputRef} checked={value} onChange={(e) => {
                     setValue(e.target.checked);
-                    setParamsOut({ [name]: e.target.checked });
+                    sendParams({ [name]: e.target.checked });
                 }} />
             );
 
@@ -29,14 +29,14 @@ function ParameterInput({ name, valueIn, setParamsOut }) {
                     onKeyUp={(target) => {
                         if (target.key === 'Enter') {
                             inputRef.current.blur();
-                            setParamsOut({ [name]: type === 'number' ? Number(value) : value });
+                            sendParams({ [name]: type === 'number' ? Number(value) : value });
                         }
                     }} />
             );
     }
 }
 
-export default function ParameterEditorCard({ paramsIn, setParamsOut }) {
+export default function ParameterEditorCard({ params, sendParams }) {
     const inputStyle = {
         display: 'inline-block',
         tableLayout: 'fixed',
@@ -46,7 +46,7 @@ export default function ParameterEditorCard({ paramsIn, setParamsOut }) {
 
     const margin = '15px';
 
-    if (paramsIn.length === 0) {
+    if (params.length === 0) {
         return (
             <Card>
                 <Card.Body>
@@ -71,7 +71,7 @@ export default function ParameterEditorCard({ paramsIn, setParamsOut }) {
                     marginRight: margin
                 }}>
                     <tbody>
-                        {Object.keys(paramsIn).map((key) =>
+                        {Object.keys(params).map((key) =>
                             <tr key={key} style={{ height: '60px', textAlign: 'left' }}>
                                 <td>
                                     {key}
@@ -82,10 +82,10 @@ export default function ParameterEditorCard({ paramsIn, setParamsOut }) {
                 </table>
                 <table style={inputStyle}>
                     <tbody>
-                        {Object.keys(paramsIn).map((key) =>
+                        {Object.keys(params).map((key) =>
                             <tr key={key} style={{ height: '60px' }}>
                                 <td>
-                                    <ParameterInput name={key} valueIn={paramsIn[key]} setParamsOut={setParamsOut} />
+                                    <ParameterInput name={key} valueIn={params[key]} sendParams={sendParams} />
                                 </td>
                             </tr>
                         )}

@@ -195,7 +195,7 @@ function trackControlFromSerial(str) {
 }
 
 function trackControlToSerial(sectionControl) {
-    let items = sectionControl.type === trackType && sectionControl.hasOwnProperty('name') ? [
+    let items = sectionControl.hasOwnProperty('name') ? [
         getTrackSectionIndex(sectionControl.name),
         sectionControl.control.speed_mps,
         sectionControl.control.rampTime_ms,

@@ -21,10 +21,8 @@ export default function App() {
     const [logsToRender, setLogsToRender] = React.useState([]);
     const [selectedLogLevel, setSelectedLogLevel] = React.useState(null);
 
-    const [paramsIn, setParamsIn] = React.useState({});
-    const [paramsOut, setParamsOut] = React.useState(paramsIn);
-    const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: {} });
-    const [trackControlOut, setTrackControlOut] = React.useState({});
+    const [params, setParams] = React.useState({});
+    const [trackControl, setTrackControl] = React.useState({ type: null, sections: {} });
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
@@ -44,20 +42,20 @@ export default function App() {
                     break;
 
                 case 'babocar/params':
-                    setParamsIn((paramsIn) => {
-                        const p = { ...paramsIn };
+                    setParams((params) => {
+                        const p = { ...params };
                         _.extend(p, JSON.parse(msg.message));
                         return p;
                     });
                     break;
 
                 case 'babocar/track-control':
-                    setTrackControlIn((trackControlIn) => {
+                    setTrackControl((trackControl) => {
                         const section = JSON.parse(msg.message);
-                        return section.type === trackControlIn.type ? {
+                        return section.type === trackControl.type ? {
                             type: section.type,
                             sections: {
-                                ...trackControlIn.sections,
+                                ...trackControl.sections,
                                 [section.name]: section.control
                             }
                         } : { type: section.type, sections: { [section.name]: section.control } };
@@ -77,17 +75,14 @@ export default function App() {
         publish('babocar/request-track-control', {});
     }, [publish]);
 
-    React.useEffect(() => {
-        if (!_.isEmpty(paramsOut)) {
-            publish('babocar/update-params', paramsOut);
-        }
-    }, [paramsOut, publish]);
+    const publishParams = React.useCallback((param) => {
+        publish('babocar/update-params', param);
+    }, [publish]);
 
-    React.useEffect(() => {
-        if (!_.isEmpty(trackControlOut)) {
-            publish('babocar/update-track-control', trackControlOut);
-        }
-    }, [trackControlOut, publish]);
+    const publishTrackControl = React.useCallback((trackControl) => {
+        const name = Object.keys(trackControl)[0];
+        publish('babocar/update-track-control', { name, control: trackControl[name] });
+    }, [publish]);
 
     // Optional log filtering based on the selected level
     React.useEffect(() => {
@@ -117,33 +112,35 @@ export default function App() {
                     </Col>
                 </Row>
                 <Row>
-                    <Col md={6} xl={5}>
+                    <Col md={3} xl={3}>
                         <Row>
-                            <Col xl={6}>
+                            <Col>                            
                                 <CarPropertiesCard car={car} />
                             </Col>
-                            <Col xl={6}>
-                                <ParameterEditorCard paramsIn={paramsIn} setParamsOut={setParamsOut} />
+                        </Row>
+                        <Row>
+                            <Col>
+                                <ParameterEditorCard params={params} sendParams={publishParams} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <MapCard car={car} />
                             </Col>
                         </Row>
                     </Col>
 
-                    <Col md={6} xl={7}>
+                    <Col md={9} xl={9}>
                         <Row>
-                            <Col xl={6} className='order-xs-2 order-xl-1'>
+                            <Col xl={7} className='order-xs-2 order-xl-1'>
                                 <Row>
                                     <Col>
-                                        <TrackControlCard trackControlIn={trackControlIn} setTrackControlOut={setTrackControlOut} />
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <MapCard car={car} />
+                                        <TrackControlCard trackControl={trackControl} sendTrackControl={publishTrackControl} />
                                     </Col>
                                 </Row>
                             </Col>
 
-                            <Col xl={6} className='order-xs-1 order-xl-2'>
+                            <Col xl={5} className='order-xs-1 order-xl-2'>
                                 <Row>
                                     <Col>
                                         <LogCard
