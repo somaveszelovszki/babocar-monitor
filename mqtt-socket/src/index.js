@@ -25,7 +25,7 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
 });
 
 mqttClient.on('connect', () => {
-    console.log('Server connected to MQTT broker');
+    console.log('mqtt-socket connected to MQTT broker');
     mqttClient.subscribe('babocar/#');
 });
 

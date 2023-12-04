@@ -17,7 +17,7 @@ if (!fs.existsSync(RECORDINGS_DIR)) {
 const stream = fs.createWriteStream(`${RECORDINGS_DIR}/${getLogFileName()}`);
 
 mqttClient.on('connect', () => {
-    console.log('Feed-recorder connected to MQTT broker');
+    console.log('feed-recorder connected to MQTT broker');
     mqttClient.subscribe('babocar/#');
 });
 

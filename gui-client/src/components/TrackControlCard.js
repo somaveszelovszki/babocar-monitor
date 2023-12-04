@@ -21,7 +21,7 @@ function ParameterInput({ valueIn, setValueOut, submitted }) {
     );
 }
 
-function SectionEditor({ sectionIn, setSectionOut, submitted }) {
+function SectionEditor({ name, sectionIn, setSectionOut, submitted }) {
     const [section, setSection] = React.useState(sectionIn);
 
     if (!_.isEqual(section, sectionIn) && submitted) {
@@ -39,41 +39,41 @@ function SectionEditor({ sectionIn, setSectionOut, submitted }) {
     return (
         <tr style={{ height: '60px' }}>
             <td style={{ textAlign: 'left' }}>
-                {section.name}
+                <b>{name}</b>
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.speed_mps}
+                    valueIn={sectionIn.speed_mps}
                     setValueOut={(v) => setSectionParam(['speed_mps'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.rampTime_ms}
+                    valueIn={sectionIn.rampTime_ms}
                     setValueOut={(v) => setSectionParam(['rampTime_ms'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.from.pos_m}
+                    valueIn={sectionIn.lineGradient.from.pos_m}
                     setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'pos_m'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.from.angle_deg}
+                    valueIn={sectionIn.lineGradient.from.angle_deg}
                     setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.to.pos_m}
+                    valueIn={sectionIn.lineGradient.to.pos_m}
                     setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'pos_m'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.control.lineGradient.to.angle_deg}
+                    valueIn={sectionIn.lineGradient.to.angle_deg}
                     setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
@@ -122,17 +122,18 @@ export default function TrackControlCard({ trackControlIn, setTrackControlOut })
                             <th>[mm]</th>
                             <th>[deg]</th>
                         </tr>
-                        {trackControlIn.sections.map((section, i) =>
-                            <SectionEditor
+                        {Object.keys(trackControlIn.sections).map((sectionName, i) => {
+                            return <SectionEditor
                                 key={i}
-                                sectionIn={section}
+                                name={sectionName}
+                                sectionIn={trackControlIn.sections[sectionName]}
                                 setSectionOut={(s) => {
                                     const newTrackControl = { ...trackControl };
                                     newTrackControl.sections[i] = s;
                                     setTrackControl(newTrackControl);
                                     setSubmitted(false);
                                 }}
-                                submitted={submitted} />
+                                submitted={submitted} />}
                         )}
                     </tbody>
                 </table>

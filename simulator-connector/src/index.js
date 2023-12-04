@@ -9,9 +9,12 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
 });
 
 mqttClient.on('connect', () => {
-    console.log('Test-connector connected to MQTT broker');
+    console.log('simulator-connector connected to MQTT broker');
 
+    mqttClient.subscribe('babocar/request-params');
     mqttClient.subscribe('babocar/update-params');
+
+    mqttClient.subscribe('babocar/request-track-control');
     mqttClient.subscribe('babocar/update-track-control');
 });
 
@@ -88,7 +91,13 @@ function broadcastParams() {
 }
 
 function broadcastTrackControl() {
-    mqttClient.publish('babocar/track-control', JSON.stringify(data.trackControl));
+    Object.keys(data.trackControl.sections).forEach((name) => {
+        mqttClient.publish('babocar/track-control', JSON.stringify({
+            type: data.trackControl.type,
+            name,
+            control: data.trackControl.sections[name]
+        }));
+    });
 }
 
 function updateParams(paramsIn) {
@@ -100,9 +109,10 @@ function updateParams(paramsIn) {
     mqttClient.publish('babocar/params', JSON.stringify(data.params));
 }
 
-function updateTrackControl(control) {
-    if (control.type == data.trackControl.type) {
-        data.trackControl.sections = control.sections;
-        broadcastTrackControl();
-    }
+function updateTrackControl(sectionControl) {
+    const { name, control } = sectionControl;
+    data.trackControl.sections[name] = control;
+    console.log(`Track control updated: ${name} = ${control}`);
+
+    broadcastTrackControl();
 }

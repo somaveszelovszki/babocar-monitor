@@ -19,8 +19,8 @@ export default function App() {
     const [logs, setLogs] = React.useState([]);
     const [paramsIn, setParamsIn] = React.useState({});
     const [paramsOut, setParamsOut] = React.useState(paramsIn);
-    const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: [] });
-    const [trackControlOut, setTrackControlOut] = React.useState(trackControlIn);
+    const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: {} });
+    const [trackControlOut, setTrackControlOut] = React.useState({});
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
@@ -47,7 +47,16 @@ export default function App() {
                     break;
 
                 case 'babocar/track-control':
-                    setTrackControlIn(JSON.parse(msg.message));
+                    setTrackControlIn((trackControlIn) => {
+                        const section = JSON.parse(msg.message);
+                        return section.type === trackControlIn.type ? {
+                            type: section.type,
+                            sections: {
+                                ...trackControlIn.sections,
+                                [section.name]: section.control
+                            }
+                        } : { type: section.type, sections: { [section.name]: section.control } };
+                    });
                     break;
 
                 default:
@@ -70,7 +79,7 @@ export default function App() {
     }, [paramsOut, publish]);
 
     React.useEffect(() => {
-        if (trackControlOut.type && !_.isEmpty(trackControlOut.sections)) {
+        if (!_.isEmpty(trackControlOut)) {
             publish('babocar/update-track-control', trackControlOut);
         }
     }, [trackControlOut, publish]);

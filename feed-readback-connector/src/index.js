@@ -17,7 +17,7 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
 });
 
 mqttClient.on('connect', () => {
-    console.log('Feed-readback connected to MQTT broker');
+    console.log('feed-readback connected to MQTT broker');
 });
 
 const startTime = { actual: Date.now(), feed: 0 };

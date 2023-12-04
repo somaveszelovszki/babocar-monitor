@@ -46,8 +46,10 @@ const mqttClient = mqtt.connect('mqtt://localhost', {
     reconnectPeriod: 1000,
 });
 
+let trackType = 'test';
+
 mqttClient.on('connect', () => {
-    console.log('Serial-connector connected to MQTT broker');
+    console.log('serial-connector connected to MQTT broker');
 
     mqttClient.subscribe('babocar/request-params');
     mqttClient.subscribe('babocar/update-params');
@@ -107,11 +109,13 @@ function handleSerialMessage(msg) {
             break;
 
         case 'R':
-            broadcastTrackControl(trackControlFromSerial('race', data));
+            trackType = 'race';
+            broadcastTrackControl(trackControlFromSerial(data));
             break;
 
         case 'T':
-            broadcastTrackControl(trackControlFromSerial('test', data));
+            trackType = 'test';
+            broadcastTrackControl(trackControlFromSerial(data));
             break;
     }
 }
@@ -174,12 +178,11 @@ function paramsToSerial(params) {
 }
 
 
-function trackControlFromSerial(trackType, str) {
+function trackControlFromSerial(str) {
     const values = JSON.parse(str);
-    let control = { type: trackType, section: {} };
-
-    control.section = {
-        name: values[0],
+    return {
+        type: trackType,
+        name: getTrackSectionName(values[0]),
         control: {
             speed_mps: values[1],
             rampTime_ms: values[2],
@@ -189,24 +192,76 @@ function trackControlFromSerial(trackType, str) {
             }
         }
     };
-
-    return control;
 }
 
-function trackControlToSerial(control) {
-    let sections = [];
+function trackControlToSerial(sectionControl) {
+    let items = sectionControl.type === trackType && sectionControl.hasOwnProperty('name') ? [
+        getTrackSectionIndex(sectionControl.name),
+        sectionControl.control.speed_mps,
+        sectionControl.control.rampTime_ms,
+        Math.round(sectionControl.control.lineGradient.from.pos_m * 1000),
+        degToRad(sectionControl.control.lineGradient.from.angle_deg),
+        Math.round(sectionControl.control.lineGradient.to.pos_m * 1000),
+        degToRad(sectionControl.control.lineGradient.to.angle_deg)
+    ] : [];
 
-    for (s in control.sections) {
-        sections.push([
-            s.name,
-            s.control.speed_mps,
-            s.control.rampTime_ms,
-            Math.round(s.control.lineGradient.from.pos_m * 1000),
-            degToRad(s.control.lineGradient.from.angle_deg),
-            Math.round(s.control.lineGradient.to.pos_m * 1000),
-            degToRad(s.control.lineGradient.to.angle_deg)
-        ]);
-    }
-
-    return toSerial('T', sections);
+    return toSerial('T', items);
 }
+
+function getTrackSectionIndex(name) {
+    const info = trackType === 'race' ? RACE_TRACK_INFO : TEST_TRACK_INFO;
+    return info.findIndex(s => s === name);
+}
+
+function getTrackSectionName(index) {
+    const info = trackType === 'race' ? RACE_TRACK_INFO : TEST_TRACK_INFO;
+    return info[index];
+}
+
+const RACE_TRACK_INFO = [
+    'fast1',
+    'slow1_prepare',
+    'slow1_round1',
+    'slow1_round2',
+    'fast2',
+    'slow2_prepare',
+    'slow2_begin1',
+    'slow2_begin2',
+    'slow2_round1',
+    'slow2_round2',
+    'fast3',
+    'slow3_prepare',
+    'slow3_round1',
+    'slow3_round2',
+    'slow3_end1',
+    'slow3_end2',
+    'fast4',
+    'slow4_prepare',
+    'slow4_round1',
+    'slow4_round2',
+];
+
+const TEST_TRACK_INFO = [
+    'fast1',
+    'slow1_prepare',
+    'slow1_chicane1',
+    'slow1_chicane2',
+    'fast2',
+    'slow2_prepare',
+    'slow2_begin',
+    'slow2_round1',
+    'slow2_round2',
+    'slow2_end1',
+    'slow2_end2',
+    'fast3',
+    'slow3_prepare',
+    'slow3_chicane1',
+    'slow3_chicane2',
+    'fast4',
+    'slow4_prepare',
+    'slow4_begin',
+    'slow4_round1',
+    'slow4_round2',
+    'slow4_end1',
+    'slow4_end2'
+];

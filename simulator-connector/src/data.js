@@ -18,30 +18,24 @@ let params = {
 
 let trackControl = {
     type: 'test',
-    sections: [
-        {
-            name: 'fast1',
-            control: {
-                speed_mps: 2.5,
-                rampTime_ms: 800,
-                lineGradient: {
-                    from: { pos_m: 0.00, angle_deg: 0.0 },
-                    to: { pos_m: 0.00, angle_deg: 0.0 }
-                }
+    sections: {
+        'fast1': {
+            speed_mps: 2.5,
+            rampTime_ms: 800,
+            lineGradient: {
+                from: { pos_m: 0.00, angle_deg: 0.0 },
+                to: { pos_m: 0.00, angle_deg: 0.0 }
             }
         },
-        {
-            name: 'slow1_prepare',
-            control: {
-                speed_mps: 1.5,
-                rampTime_ms: 800,
-                lineGradient: {
-                    from: { pos_m: 0.00, angle_deg: 0.0 },
-                    to: { pos_m: -0.10, angle_deg: 10.0 }
-                }
+        'slow1_prepare': {
+            speed_mps: 1.5,
+            rampTime_ms: 800,
+            lineGradient: {
+                from: { pos_m: 0.00, angle_deg: 0.0 },
+                to: { pos_m: -0.10, angle_deg: 10.0 }
             }
         }
-    ]
+    }
 };
 
 module.exports = { car, params, trackControl };
