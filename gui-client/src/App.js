@@ -16,7 +16,11 @@ const socket = socketIO.connect('http://localhost:3001');
 
 export default function App() {
     const [car, setCar] = React.useState({ pos_m: null, angle_deg: null, speed_mps: null });
+    // Logging-related states
     const [logs, setLogs] = React.useState([]);
+    const [logsToRender, setLogsToRender] = React.useState([]);
+    const [selectedLogLevel, setSelectedLogLevel] = React.useState(null);
+
     const [paramsIn, setParamsIn] = React.useState({});
     const [paramsOut, setParamsOut] = React.useState(paramsIn);
     const [trackControlIn, setTrackControlIn] = React.useState({ type: null, sections: {} });
@@ -35,6 +39,7 @@ export default function App() {
                     break;
 
                 case 'babocar/log':
+                    // TODO: should we only store the logs which are filtered by the selected log level?
                     setLogs((logs) => utils.unshiftFIFO(logs, JSON.parse(msg.message), 200));
                     break;
 
@@ -84,6 +89,25 @@ export default function App() {
         }
     }, [trackControlOut, publish]);
 
+    // Optional log filtering based on the selected level
+    React.useEffect(() => {
+        // Preparing time measurement
+        const now = new Date().getTime();
+        console.time(`logs-filtering-${now}`);
+
+        // Optional filtering
+        let logsToStore = logs;
+        if (selectedLogLevel) {
+            logsToStore = logs.filter(log => log.level === selectedLogLevel);
+        }
+
+        // Display time measurement
+        console.timeEnd(`logs-filtering-${now}`);
+
+        // Update state variable
+        setLogsToRender(logsToStore);
+    }, [logs, selectedLogLevel])
+
     return (
         <div className='app'>
             <Container fluid>
@@ -122,7 +146,12 @@ export default function App() {
                             <Col xl={6} className='order-xs-1 order-xl-2'>
                                 <Row>
                                     <Col>
-                                        <LogCard logs={logs} setLogs={setLogs} />
+                                        <LogCard
+                                            logs={logsToRender}
+                                            setLogs={setLogs}
+                                            selectedLogLevel={selectedLogLevel}
+                                            setSelectedLogLevel={setSelectedLogLevel}
+                                        />
                                     </Col>
                                 </Row>
                             </Col>

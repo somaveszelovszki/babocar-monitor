@@ -1,23 +1,30 @@
-import { Button, Card, Col, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Row, Table, Form } from 'react-bootstrap';
 
 import * as utils from '../Utils'
 
+export const LOG_LEVELS = {
+    DEBUG: 'D',
+    INFO: 'I',
+    WARNING: 'W',
+    ERROR: 'E'
+};
+
 function getColor(level) {
     switch (level) {
-        case 'D': return 'light';
-        case 'I': return 'info';
-        case 'W': return 'warning';
-        case 'E': return 'danger';
+        case LOG_LEVELS.DEBUG: return 'light';
+        case LOG_LEVELS.INFO: return 'info';
+        case LOG_LEVELS.WARNING: return 'warning';
+        case LOG_LEVELS.ERROR: return 'danger';
         default: return null;
     }
 }
 
 function getText(level) {
     switch (level) {
-        case 'D': return 'Debug';
-        case 'I': return 'Info';
-        case 'W': return 'Warn';
-        case 'E': return 'Error';
+        case LOG_LEVELS.DEBUG: return 'Debug';
+        case LOG_LEVELS.INFO: return 'Info';
+        case LOG_LEVELS.WARNING: return 'Warn';
+        case LOG_LEVELS.ERROR: return 'Error';
         default: return null;
     }
 }
@@ -34,7 +41,26 @@ function Log({ log }) {
     )
 }
 
-export default function LogCard({ logs, setLogs }) {
+function LogLevelSelector({ selectedLogLevel, setSelectedLogLevel }) {
+    const defaultOption = "Select log level";
+    return (
+        <div>
+            <Form.Select
+                value={selectedLogLevel}
+                onChange={(event) => setSelectedLogLevel(event.target.value === defaultOption ? null : event.target.value)}
+            >
+                <option value={null}>{defaultOption}</option>
+                <option value={LOG_LEVELS.DEBUG}>Debug</option>
+                <option value={LOG_LEVELS.INFO}>Info</option>
+                <option value={LOG_LEVELS.WARNING}>Warn</option>
+                <option value={LOG_LEVELS.ERROR}>Error</option>
+            </Form.Select>
+        </div>
+    );
+}
+
+export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLogLevel }) {
+
     return (
         <Card>
             <Card.Body>
@@ -43,6 +69,12 @@ export default function LogCard({ logs, setLogs }) {
                         <Col>Logs</Col>
                         <Col>
                             <Button variant="danger" onClick={() => { setLogs([]) }}>Clear</Button>
+                        </Col>
+                        <Col>
+                            <LogLevelSelector
+                                selectedLogLeve={selectedLogLevel}
+                                setSelectedLogLevel={setSelectedLogLevel}
+                            />
                         </Col>
                     </Row>
                 </Card.Title>
