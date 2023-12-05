@@ -62,7 +62,6 @@ export default function App() {
                             existingSection.control = control;
                         } else {
                             newTrackControl.sections.push({ index, name, control });
-                            newTrackControl.sections = newTrackControl.sections.sort((a, b) => a.index - b.index);
                         }
 
                         return newTrackControl;

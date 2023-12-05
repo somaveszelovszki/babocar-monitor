@@ -46,7 +46,15 @@ export default function ParameterEditorCard({ params, sendParams }) {
 
     const margin = '15px';
 
-    if (params.length === 0) {
+
+    const sortedParams = React.useMemo(() => Object.keys(params)
+        .sort()
+        .reduce((sorted, key) => {
+            sorted[key] = params[key];
+            return sorted;
+        }, {}), [params]);
+
+    if (sortedParams.length === 0) {
         return (
             <Card>
                 <Card.Body>
@@ -71,7 +79,7 @@ export default function ParameterEditorCard({ params, sendParams }) {
                     marginRight: margin
                 }}>
                     <tbody>
-                        {Object.keys(params).map((key) =>
+                        {Object.keys(sortedParams).map((key) =>
                             <tr key={key} style={{ height: '60px', textAlign: 'left' }}>
                                 <td>
                                     {key}
@@ -82,10 +90,10 @@ export default function ParameterEditorCard({ params, sendParams }) {
                 </table>
                 <table style={inputStyle}>
                     <tbody>
-                        {Object.keys(params).map((key) =>
+                        {Object.keys(sortedParams).map((key) =>
                             <tr key={key} style={{ height: '60px' }}>
                                 <td>
-                                    <ParameterInput name={key} valueIn={params[key]} sendParams={sendParams} />
+                                    <ParameterInput name={key} valueIn={sortedParams[key]} sendParams={sendParams} />
                                 </td>
                             </tr>
                         )}

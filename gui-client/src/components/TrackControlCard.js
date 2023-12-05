@@ -89,6 +89,10 @@ function SectionEditor({ index, name, controlIn, sendTrackControl }) {
 }
 
 export default function TrackControlCard({ trackControl, sendTrackControl }) {
+    const sortedSections = React.useMemo(() =>
+        trackControl.sections.sort((a, b) => a.index - b.index),
+        [trackControl]);
+
     return (
         <Card>
             <Card.Body>
@@ -116,7 +120,7 @@ export default function TrackControlCard({ trackControl, sendTrackControl }) {
                             <th>[mm]</th>
                             <th>[deg]</th>
                         </tr>
-                        {trackControl.sections.map(s =>
+                        {sortedSections.map(s =>
                             <SectionEditor
                                 key={s.index}
                                 index={s.index}
