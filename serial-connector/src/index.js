@@ -63,11 +63,11 @@ mqttClient.on('message', (topic, payload) => {
     const message = JSON.parse(payload.toString());
     switch (topic) {
         case 'babocar/request-params':
-            serialPort.write(paramsToSerial({}));
+            serialPort.write(paramToSerial({}));
             break;
 
         case 'babocar/update-params':
-            serialPort.write(paramsToSerial(message));
+            serialPort.write(paramToSerial(message));
             break;
 
         case 'babocar/request-track-control':
@@ -106,7 +106,7 @@ function handleSerialMessage(msg) {
             break;
 
         case 'P':
-            broadcastParams(paramsFromSerial(data));
+            broadcastParam(paramFromSerial(data));
             break;
 
         case 'R':
@@ -133,8 +133,8 @@ function broadcastCar(car) {
     mqttClient.publish('babocar/car', JSON.stringify(car));
 }
 
-function broadcastParams(params) {
-    mqttClient.publish('babocar/params', JSON.stringify(params));
+function broadcastParam(param) {
+    mqttClient.publish('babocar/params', JSON.stringify(param));
 }
 
 function broadcastTrackControl(trackControl) {
@@ -170,12 +170,12 @@ function carFromSerial(str) {
     };
 }
 
-function paramsFromSerial(str) {
+function paramFromSerial(str) {
     return JSON.parse(str);
 }
 
-function paramsToSerial(params) {
-    return toSerial('P', params);
+function paramToSerial(param) {
+    return toSerial('P', _.mapValues(param, (value) => value.toFixed ? Number(value.toFixed(2)) : value));
 }
 
 
@@ -205,12 +205,12 @@ function trackControlToSerial(sectionControl) {
     const { index, control } = sectionControl;
     let items = [
         index,
-        control.speed_mps,
-        control.rampTime_ms,
+        Number(control.speed_mps.toFixed(2)),
+        Math.round(control.rampTime_ms),
         Math.round(control.lineGradient.from.pos_m * 1000),
-        degToRad(control.lineGradient.from.angle_deg),
+        Number(degToRad(control.lineGradient.from.angle_deg).toFixed(4)),
         Math.round(control.lineGradient.to.pos_m * 1000),
-        degToRad(control.lineGradient.to.angle_deg)
+        Number(degToRad(control.lineGradient.to.angle_deg).toFixed(4))
     ];
 
     return toSerial('T', items);
