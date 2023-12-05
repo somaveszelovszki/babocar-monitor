@@ -21,19 +21,19 @@ function ParameterInput({ valueIn, setValueOut, submitted }) {
     );
 }
 
-function SectionEditor({ name, sectionIn, sendTrackControl }) {
-    const [section, setSection] = React.useState(sectionIn);
+function SectionEditor({ index, name, controlIn, sendTrackControl }) {
+    const [control, setControl] = React.useState(controlIn);
     const [submitted, setSubmitted] = React.useState(true);
 
-    if (!_.isEqual(section, sectionIn) && submitted) {
-        setSection({ ...sectionIn });
+    if (!_.isEqual(control, controlIn) && submitted) {
+        setControl({ ...controlIn });
     }
 
-    const setSectionParam = (path, param) => {
-        const newSection = { ...section };
+    const setControlParam = (path, param) => {
+        const newControl = { ...control };
         const lastKey = path.pop();
-        path.reduce((obj, key) => obj[key], newSection)[lastKey] = param;
-        setSection(newSection);
+        path.reduce((obj, key) => obj[key], newControl)[lastKey] = param;
+        setControl(newControl);
         setSubmitted(false);
     }
 
@@ -44,43 +44,43 @@ function SectionEditor({ name, sectionIn, sendTrackControl }) {
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.speed_mps}
-                    setValueOut={(v) => setSectionParam(['speed_mps'], v)}
+                    valueIn={controlIn.speed_mps}
+                    setValueOut={(v) => setControlParam(['speed_mps'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.rampTime_ms}
-                    setValueOut={(v) => setSectionParam(['rampTime_ms'], v)}
+                    valueIn={controlIn.rampTime_ms}
+                    setValueOut={(v) => setControlParam(['rampTime_ms'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.lineGradient.from.pos_m}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'pos_m'], v)}
+                    valueIn={controlIn.lineGradient.from.pos_m}
+                    setValueOut={(v) => setControlParam(['lineGradient', 'from', 'pos_m'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.lineGradient.from.angle_deg}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'from', 'angle_deg'], v)}
+                    valueIn={controlIn.lineGradient.from.angle_deg}
+                    setValueOut={(v) => setControlParam(['lineGradient', 'from', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.lineGradient.to.pos_m}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'pos_m'], v)}
+                    valueIn={controlIn.lineGradient.to.pos_m}
+                    setValueOut={(v) => setControlParam(['lineGradient', 'to', 'pos_m'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <ParameterInput
-                    valueIn={sectionIn.lineGradient.to.angle_deg}
-                    setValueOut={(v) => setSectionParam(['lineGradient', 'to', 'angle_deg'], v)}
+                    valueIn={controlIn.lineGradient.to.angle_deg}
+                    setValueOut={(v) => setControlParam(['lineGradient', 'to', 'angle_deg'], v)}
                     submitted={submitted} />
             </td>
             <td>
                 <Button variant="info" disabled={submitted} onClick={() => {
-                    sendTrackControl({ name, control: section });
+                    sendTrackControl({ index, control });
                     setSubmitted(true);
                 }}>Send</Button>
             </td>
@@ -116,13 +116,13 @@ export default function TrackControlCard({ trackControl, sendTrackControl }) {
                             <th>[mm]</th>
                             <th>[deg]</th>
                         </tr>
-                        {Object.keys(trackControl.sections).map((sectionName, i) => {
-                            return <SectionEditor
-                                key={i}
-                                name={sectionName}
-                                sectionIn={trackControl.sections[sectionName]}
+                        {trackControl.sections.map(s =>
+                            <SectionEditor
+                                key={s.index}
+                                index={s.index}
+                                name={s.name}
+                                controlIn={s.control}
                                 sendTrackControl={sendTrackControl} />
-                            }
                         )}
                     </tbody>
                 </table>

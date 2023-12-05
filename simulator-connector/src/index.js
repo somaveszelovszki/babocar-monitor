@@ -91,11 +91,10 @@ function broadcastParams() {
 }
 
 function broadcastTrackControl() {
-    Object.keys(data.trackControl.sections).forEach((name) => {
+    data.trackControl.sections.forEach((section, index) => {
+        const { name, control } = section;
         mqttClient.publish('babocar/track-control', JSON.stringify({
-            type: data.trackControl.type,
-            name,
-            control: data.trackControl.sections[name]
+            type: data.trackControl.type, index, name, control
         }));
     });
 }
@@ -103,16 +102,17 @@ function broadcastTrackControl() {
 function updateParams(paramsIn) {
     Object.keys(paramsIn).forEach(key => {
         data.params[key] = paramsIn[key];
-        console.log(`Params updated: ${key} = ${data.params[key]}`);
+        console.log(`Params updated: ${key}: ${data.params[key]}`);
     });
 
     mqttClient.publish('babocar/params', JSON.stringify(data.params));
 }
 
 function updateTrackControl(sectionControl) {
-    const { name, control } = sectionControl;
-    data.trackControl.sections[name] = control;
-    console.log(`Track control updated: ${name} = ${control}`);
+    const { index, control } = sectionControl;
+    const sectionToUpdate = data.trackControl.sections[index];
+    sectionToUpdate.control = control;
+    console.log(`Track control updated: ${index}: ${JSON.stringify(sectionToUpdate)}`);
 
     broadcastTrackControl();
 }

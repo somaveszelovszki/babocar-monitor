@@ -22,7 +22,7 @@ export default function App() {
     const [selectedLogLevel, setSelectedLogLevel] = React.useState(null);
 
     const [params, setParams] = React.useState({});
-    const [trackControl, setTrackControl] = React.useState({ type: null, sections: {} });
+    const [trackControl, setTrackControl] = React.useState({ type: null, sections: [] });
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
@@ -51,14 +51,21 @@ export default function App() {
 
                 case 'babocar/track-control':
                     setTrackControl((trackControl) => {
-                        const section = JSON.parse(msg.message);
-                        return section.type === trackControl.type ? {
-                            type: section.type,
-                            sections: {
-                                ...trackControl.sections,
-                                [section.name]: section.control
-                            }
-                        } : { type: section.type, sections: { [section.name]: section.control } };
+                        const { type, index, name, control } = JSON.parse(msg.message);
+                        const newTrackControl = {
+                            type,
+                            sections: type === trackControl.type ? trackControl.sections : []
+                        };
+
+                        const existingSection = newTrackControl.sections.find(s => s.name === name);
+                        if (existingSection) {
+                            existingSection.control = control;
+                        } else {
+                            newTrackControl.sections.push({ index, name, control });
+                            newTrackControl.sections = newTrackControl.sections.sort((a, b) => a.index < b.index);
+                        }
+
+                        return newTrackControl;
                     });
                     break;
 
@@ -80,8 +87,7 @@ export default function App() {
     }, [publish]);
 
     const publishTrackControl = React.useCallback((trackControl) => {
-        const name = Object.keys(trackControl)[0];
-        publish('babocar/update-track-control', { name, control: trackControl[name] });
+        publish('babocar/update-track-control', trackControl);
     }, [publish]);
 
     // Optional log filtering based on the selected level

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { SerialPort } = require('serialport');
 const mqtt = require('mqtt');
 
@@ -180,9 +181,11 @@ function paramsToSerial(params) {
 
 function trackControlFromSerial(str) {
     const values = JSON.parse(str);
+    const index = values[0];
     return {
         type: trackType,
-        name: getTrackSectionName(values[0]),
+        index,
+        name: getTrackSectionName(index),
         control: {
             speed_mps: values[1],
             rampTime_ms: values[2],
@@ -195,22 +198,22 @@ function trackControlFromSerial(str) {
 }
 
 function trackControlToSerial(sectionControl) {
-    let items = sectionControl.hasOwnProperty('name') ? [
-        getTrackSectionIndex(sectionControl.name),
-        sectionControl.control.speed_mps,
-        sectionControl.control.rampTime_ms,
-        Math.round(sectionControl.control.lineGradient.from.pos_m * 1000),
-        degToRad(sectionControl.control.lineGradient.from.angle_deg),
-        Math.round(sectionControl.control.lineGradient.to.pos_m * 1000),
-        degToRad(sectionControl.control.lineGradient.to.angle_deg)
-    ] : [];
+    if (_.isEmpty(sectionControl)) {
+        return toSerial('T', []); 
+    }
+
+    const { index, control } = sectionControl;
+    let items = [
+        index,
+        control.speed_mps,
+        control.rampTime_ms,
+        Math.round(control.lineGradient.from.pos_m * 1000),
+        degToRad(control.lineGradient.from.angle_deg),
+        Math.round(control.lineGradient.to.pos_m * 1000),
+        degToRad(control.lineGradient.to.angle_deg)
+    ];
 
     return toSerial('T', items);
-}
-
-function getTrackSectionIndex(name) {
-    const info = trackType === 'race' ? RACE_TRACK_INFO : TEST_TRACK_INFO;
-    return info.findIndex(s => s === name);
 }
 
 function getTrackSectionName(index) {
