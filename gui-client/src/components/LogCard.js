@@ -1,6 +1,7 @@
 import { Button, Card, Col, Row, Table, Form } from 'react-bootstrap';
-
 import * as utils from '../Utils'
+import { useEffect, useState } from 'react'
+import { useDebounce } from 'usehooks-ts'
 
 export const LOG_LEVELS = {
     DEBUG: 'D',
@@ -59,7 +60,30 @@ function LogLevelSelector({ selectedLogLevel, setSelectedLogLevel }) {
     );
 }
 
-export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLogLevel }) {
+function LogFilteringKeywordInput({ setLogFilteringKeyword }) {
+
+    const [keyword, setKeyword] = useState('');
+    const debouncedValue = useDebounce(keyword, 500);
+
+    useEffect(() => {
+        // Triggers when "debouncedValue" changes
+        setLogFilteringKeyword(debouncedValue);
+    }, [debouncedValue, setLogFilteringKeyword])
+
+    return (
+        <div>
+            Filter:{' '}
+            <input
+                type="text"
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+            />
+            {debouncedValue && ` (debounced: ${debouncedValue})`}
+        </div>
+    );
+}
+
+export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLogLevel, setLogFilteringKeyword }) {
 
     return (
         <Card>
@@ -75,6 +99,11 @@ export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLo
                                 selectedLogLeve={selectedLogLevel}
                                 setSelectedLogLevel={setSelectedLogLevel}
                             />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <LogFilteringKeywordInput setLogFilteringKeyword={setLogFilteringKeyword} />
                         </Col>
                     </Row>
                 </Card.Title>

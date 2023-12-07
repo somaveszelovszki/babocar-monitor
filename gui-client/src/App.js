@@ -20,6 +20,7 @@ export default function App() {
     const [logs, setLogs] = React.useState([]);
     const [logsToRender, setLogsToRender] = React.useState([]);
     const [selectedLogLevel, setSelectedLogLevel] = React.useState(null);
+    const [logFilteringKeyword, setLogFilteringKeyword] = React.useState('');
 
     const [params, setParams] = React.useState({});
     const [trackControl, setTrackControl] = React.useState({ type: null, sections: [] });
@@ -98,7 +99,12 @@ export default function App() {
         // Optional filtering
         let logsToStore = logs;
         if (selectedLogLevel) {
+            console.log('Filtering logs by level:', { selectedLogLevel });
             logsToStore = logs.filter(log => log.level === selectedLogLevel);
+        }
+        if (logFilteringKeyword) {
+            console.log('Filtering logs by keyword:', { logFilteringKeyword });
+            logsToStore = logsToStore.filter(log => log.text.toLowerCase().includes(logFilteringKeyword.toLowerCase()));
         }
 
         // Display time measurement
@@ -106,7 +112,7 @@ export default function App() {
 
         // Update state variable
         setLogsToRender(logsToStore);
-    }, [logs, selectedLogLevel])
+    }, [logs, selectedLogLevel, logFilteringKeyword])
 
     return (
         <div className='app'>
@@ -119,7 +125,7 @@ export default function App() {
                 <Row>
                     <Col md={3} xl={3}>
                         <Row>
-                            <Col>                            
+                            <Col>
                                 <CarPropertiesCard car={car} />
                             </Col>
                         </Row>
@@ -153,6 +159,7 @@ export default function App() {
                                             setLogs={setLogs}
                                             selectedLogLevel={selectedLogLevel}
                                             setSelectedLogLevel={setSelectedLogLevel}
+                                            setLogFilteringKeyword={setLogFilteringKeyword}
                                         />
                                     </Col>
                                 </Row>
