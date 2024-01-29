@@ -11,6 +11,7 @@ import LogCard from './components/LogCard'
 import MapCard from './components/MapCard'
 import ParameterEditorCard from './components/ParameterEditorCard'
 import TrackControlCard from './components/TrackControlCard';
+import PirateCarPropertiesCard from './components/PirateCarPropertiesCard';
 
 const socket = socketIO.connect('http://localhost:3001');
 
@@ -24,6 +25,9 @@ export default function App() {
 
     const [params, setParams] = React.useState({});
     const [trackControl, setTrackControl] = React.useState({ type: null, sections: [] });
+
+    // Pirate-related states
+    const [pirate, setPirate] = React.useState({ state: 'PMK063' });
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
@@ -69,6 +73,10 @@ export default function App() {
                     });
                     break;
 
+                case 'babocar/pirate':
+                    console.log(`Topic: babocar/pirate, message: ${JSON.parse(msg.message)}`);
+                    break;
+
                 default:
                     console.log(`Unhandled topic: ${msg.topic}`);
             }
@@ -88,6 +96,16 @@ export default function App() {
 
     const publishTrackControl = React.useCallback((trackControl) => {
         publish('babocar/update-track-control', trackControl);
+    }, [publish]);
+
+    const publishPirateProperties = React.useCallback((paramsIn) => {
+        // We only support pirate.state now
+        const { state } = paramsIn;
+        console.log('publishPirateProperties', paramsIn);
+        setPirate((pirateParams) => {
+            return { ...pirateParams, ...paramsIn };
+        });
+        publish('babocar/update-pirate', state);
     }, [publish]);
 
     // Optional log filtering based on the selected level
@@ -124,6 +142,14 @@ export default function App() {
                 </Row>
                 <Row>
                     <Col md={3} xl={3}>
+                        <Row>
+                            <Col>
+                                <PirateCarPropertiesCard
+                                    pirate={pirate}
+                                    sendParams={publishPirateProperties}
+                                />
+                            </Col>
+                        </Row>
                         <Row>
                             <Col>
                                 <CarPropertiesCard car={car} />

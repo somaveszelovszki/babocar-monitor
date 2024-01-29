@@ -57,6 +57,8 @@ mqttClient.on('connect', () => {
 
     mqttClient.subscribe('babocar/request-track-control');
     mqttClient.subscribe('babocar/update-track-control');
+
+    mqttClient.subscribe('babocar/update-pirate');
 });
 
 mqttClient.on('message', (topic, payload) => {
@@ -76,6 +78,10 @@ mqttClient.on('message', (topic, payload) => {
 
         case 'babocar/update-track-control':
             serialPort.write(trackControlToSerial(message));
+            break;
+
+        case 'babocar/update-pirate':
+            serialPort.write(pirateToSerial(message));
             break;
 
         default:
@@ -199,7 +205,7 @@ function trackControlFromSerial(str) {
 
 function trackControlToSerial(sectionControl) {
     if (_.isEmpty(sectionControl)) {
-        return toSerial('T', []); 
+        return toSerial('T', []);
     }
 
     const { index, control } = sectionControl;
@@ -268,3 +274,15 @@ const TEST_TRACK_INFO = [
     'slow4_end1',
     'slow4_end2'
 ];
+
+function pirateToSerial(pirate) {
+    // code is K from 'kalóz' because P from 'pirate' is already reserved
+    const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
+    const isMatch = validPirateStatePattern.test(pirate);
+    if (isMatch) {
+        return toSerial('K', pirate);
+    }
+
+    // implicit else, todo???
+    return toSerial('K', '');
+}

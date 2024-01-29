@@ -16,6 +16,8 @@ mqttClient.on('connect', () => {
 
     mqttClient.subscribe('babocar/request-track-control');
     mqttClient.subscribe('babocar/update-track-control');
+
+    mqttClient.subscribe('babocar/update-pirate');
 });
 
 mqttClient.on('message', (topic, payload) => {
@@ -35,6 +37,10 @@ mqttClient.on('message', (topic, payload) => {
 
         case 'babocar/update-track-control':
             updateTrackControl(message);
+            break;
+
+        case 'babocar/update-pirate':
+            broadcastPirateProperties(message);
             break;
 
         default:
@@ -115,4 +121,18 @@ function updateTrackControl(sectionControl) {
     console.log(`Track control updated: ${index}: ${JSON.stringify(sectionToUpdate)}`);
 
     broadcastTrackControl();
+}
+
+function broadcastPirateProperties(currentPirateState) {
+    console.log('broadcastPirateProperties', currentPirateState);
+
+    const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
+    const isMatch = validPirateStatePattern.test(currentPirateState);
+    if (isMatch) {
+        console.log('broadcastPirateProperties paramsIn format is OK, call mqtt publish.');
+        mqttClient.publish('babocar/pirate', JSON.stringify(currentPirateState));
+    }
+    else {
+        console.log('broadcastPirateProperties paramsIn is in invalid format! Skipped mqtt publish.');
+    }
 }
