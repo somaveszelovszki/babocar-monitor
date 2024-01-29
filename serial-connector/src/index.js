@@ -275,14 +275,15 @@ const TEST_TRACK_INFO = [
     'slow4_end2'
 ];
 
+// Code is 'O' from 'Obstacle'
+const OBSTACLE_SERIAL_CODE = 'O';
 function pirateToSerial(pirate) {
-    // code is K from 'kalóz' because P from 'pirate' is already reserved
     const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
     const isMatch = validPirateStatePattern.test(pirate);
     if (isMatch) {
-        return toSerial('K', pirate);
+        return toSerial(OBSTACLE_SERIAL_CODE, pirate);
     }
 
     // implicit else, todo???
-    return toSerial('K', '');
+    return toSerial(OBSTACLE_SERIAL_CODE, '');
 }
