@@ -7,7 +7,7 @@ SerialPort.list().then(ports => {
     ports.forEach(port => console.log(port));
 });
 
-const SERIAL_PORT_PATH = 'COM6'
+const SERIAL_PORT_PATH = 'COM8'
 
 const serialPort = new SerialPort({
     path: SERIAL_PORT_PATH,
@@ -222,6 +222,10 @@ function trackControlToSerial(sectionControl) {
     return toSerial('T', items);
 }
 
+function pirateToSerial(pirate) {
+    return toSerial('O', pirate);
+}
+
 function getTrackSectionName(index) {
     const info = trackType === 'race' ? RACE_TRACK_INFO : TEST_TRACK_INFO;
     return info[index];
@@ -274,16 +278,3 @@ const TEST_TRACK_INFO = [
     'slow4_end1',
     'slow4_end2'
 ];
-
-// Code is 'O' from 'Obstacle'
-const OBSTACLE_SERIAL_CODE = 'O';
-function pirateToSerial(pirate) {
-    const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
-    const isMatch = validPirateStatePattern.test(pirate);
-    if (isMatch) {
-        return toSerial(OBSTACLE_SERIAL_CODE, pirate);
-    }
-
-    // implicit else, todo???
-    return toSerial(OBSTACLE_SERIAL_CODE, '');
-}

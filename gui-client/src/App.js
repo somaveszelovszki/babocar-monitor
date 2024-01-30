@@ -27,7 +27,7 @@ export default function App() {
     const [trackControl, setTrackControl] = React.useState({ type: null, sections: [] });
 
     // Pirate-related states
-    const [pirate, setPirate] = React.useState({ state: 'PMK063' });
+    const [pirate, setPirate] = React.useState({ state: 'ACE000' });
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));

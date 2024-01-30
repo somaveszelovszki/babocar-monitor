@@ -18,6 +18,11 @@ function ParameterInput({ name, valueIn, sendParams }) {
             onKeyUp={(target) => {
                 if (target.key === 'Enter') {
                     inputRef.current.blur();
+                    const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
+                    if (!validPirateStatePattern.test(value)) {
+                        console.log(`Invalid pirate state received: ${value}`);
+                        return;
+                    }
                     sendParams({ [name]: value });
                 }
             }} />
