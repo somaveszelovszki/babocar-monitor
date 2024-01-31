@@ -13,7 +13,11 @@ import ParameterEditorCard from './components/ParameterEditorCard'
 import TrackControlCard from './components/TrackControlCard';
 import PirateCarPropertiesCard from './components/PirateCarPropertiesCard';
 
-const socket = socketIO.connect('http://localhost:3001');
+const messagesToIgnore = [
+    'Control data timed out'
+]
+
+const socket = socketIO.connect(process.env.REACT_APP_SOCKET_ADDRESS);
 
 // Flood-related config
 const FLOOD_MESSAGE_TO_SERIAL = "FLOOD!";
@@ -25,7 +29,12 @@ export default function App() {
     const [logs, setLogs] = React.useState([]);
     const [logsToRender, setLogsToRender] = React.useState([]);
     const [selectedLogLevel, setSelectedLogLevel] = React.useState(null);
+    const [ignoreDefaultMessages, setIgnoreDefaultMessages] = React.useState(true);
     const [logFilteringKeyword, setLogFilteringKeyword] = React.useState('');
+
+    // Pattern-related states
+    const [frontPattern, setFrontPattern] = React.useState(null);
+    const [rearPattern, setRearPattern] = React.useState(null);
 
     const [params, setParams] = React.useState({});
     const [trackControl, setTrackControl] = React.useState({ type: null, sections: [] });
@@ -51,7 +60,31 @@ export default function App() {
 
                 case 'babocar/log':
                     // TODO: should we only store the logs which are filtered by the selected log level?
-                    setLogs((logs) => utils.unshiftFIFO(logs, JSON.parse(msg.message), 200));
+                    const parsedMessage = JSON.parse(msg.message);
+                    setLogs((logs) => utils.unshiftFIFO(logs, parsedMessage, 200));
+
+                    // Seaching for pattern changes
+                    const { text } = parsedMessage;
+                    if (text?.includes('pattern changed')) {
+                        console.log('pattern changed');
+
+                        // Use a regular expression to extract the value inside the square brackets after 'to'
+                        const match = text.match(/to \[([^\]]+)\]/);
+
+                        // Check if a match is found
+                        if (match) {
+
+                            // The value you want is in the first capture group (index 1)
+                            const extractedValue = match[1];
+                            console.log({ extractedValue });
+
+                            if (text.includes('Front')) {
+                                setFrontPattern(extractedValue);
+                            } else if (text.includes('Rear')) {
+                                setRearPattern(extractedValue);
+                            }
+                        }
+                    }
                     break;
 
                 case 'babocar/params':
@@ -130,9 +163,15 @@ export default function App() {
 
         // Optional filtering
         let logsToStore = logs;
+
+        if (ignoreDefaultMessages) {
+            //console.log('Ignoring default messages', { ignoreDefaultMessages });
+            logsToStore = logsToStore.filter(log => messagesToIgnore.includes(log.text) === false);
+        }
+
         if (selectedLogLevel) {
             //console.log('Filtering logs by level:', { selectedLogLevel });
-            logsToStore = logs.filter(log => log.level === selectedLogLevel);
+            logsToStore = logsToStore.filter(log => log.level === selectedLogLevel);
         }
         if (logFilteringKeyword) {
             //console.log('Filtering logs by keyword:', { logFilteringKeyword });
@@ -144,7 +183,7 @@ export default function App() {
 
         // Update state variable
         setLogsToRender(logsToStore);
-    }, [logs, selectedLogLevel, logFilteringKeyword])
+    }, [logs, selectedLogLevel, logFilteringKeyword, ignoreDefaultMessages]);
 
     useEffect(function sendPeriodicFloodMessageAfterCheckboxChange() {
         console.log('sendPeriodicFloodMessageAfterCheckboxChange', { sendPeriodicFloodMessage });
@@ -175,7 +214,11 @@ export default function App() {
             <Container fluid>
                 <Row>
                     <Col>
-                        <Header isDirectControlEnabled={car.isRemoteControlled} />
+                        <Header
+                            isDirectControlEnabled={car.isRemoteControlled}
+                            frontPattern={frontPattern}
+                            rearPattern={rearPattern}
+                        />
                     </Col>
                 </Row>
                 <Row>
@@ -228,6 +271,8 @@ export default function App() {
                                             selectedLogLevel={selectedLogLevel}
                                             setSelectedLogLevel={setSelectedLogLevel}
                                             setLogFilteringKeyword={setLogFilteringKeyword}
+                                            ignoreDefaultMessages={ignoreDefaultMessages}
+                                            setIgnoreDefaultMessages={setIgnoreDefaultMessages}
                                         />
                                     </Col>
                                 </Row>

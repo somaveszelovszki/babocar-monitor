@@ -83,7 +83,15 @@ function LogFilteringKeywordInput({ setLogFilteringKeyword }) {
     );
 }
 
-export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLogLevel, setLogFilteringKeyword }) {
+export default function LogCard({
+    logs,
+    setLogs,
+    selectedLogLevel,
+    setSelectedLogLevel,
+    setLogFilteringKeyword,
+    ignoreDefaultMessages,
+    setIgnoreDefaultMessages
+}) {
 
     return (
         <Card>
@@ -104,6 +112,16 @@ export default function LogCard({ logs, setLogs, selectedLogLevel, setSelectedLo
                     <Row>
                         <Col>
                             <LogFilteringKeywordInput setLogFilteringKeyword={setLogFilteringKeyword} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            Ignore default messages:
+                            <input
+                                type="checkbox"
+                                value={ignoreDefaultMessages}
+                                onChange={() => setIgnoreDefaultMessages((previous) => !previous)}
+                            />
                         </Col>
                     </Row>
                 </Card.Title>

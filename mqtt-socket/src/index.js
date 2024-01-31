@@ -4,7 +4,7 @@ const http = require('http');
 const socketIO = require("socket.io");
 const mqtt = require('mqtt');
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 app.use(cors());
@@ -31,6 +31,7 @@ mqttClient.on('connect', () => {
 
 mqttClient.on('message', (topic, payload) => {
     const message = payload.toString();
+    //console.log('message', message);
     io && io.emit('message', JSON.stringify({ topic, message }));
 });
 

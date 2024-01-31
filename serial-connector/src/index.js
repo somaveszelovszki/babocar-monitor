@@ -1,13 +1,14 @@
 const _ = require('lodash');
 const { SerialPort } = require('serialport');
 const mqtt = require('mqtt');
+require('dotenv').config();
 
 SerialPort.list().then(ports => {
     console.log('Serial ports:');
     ports.forEach(port => console.log(port));
 });
 
-const SERIAL_PORT_PATH = 'COM8'
+const SERIAL_PORT_PATH = process.env.SERIAL_PORT;
 
 const serialPort = new SerialPort({
     path: SERIAL_PORT_PATH,
@@ -24,6 +25,7 @@ serialPort.on('open', function () {
 
 let serialData = '';
 serialPort.on('data', function (data) {
+    //console.log('on data event', data.toString());
     serialData += data.toString();
     while (true) {
         const delimiter = serialData.indexOf('\n');
@@ -31,8 +33,10 @@ serialPort.on('data', function (data) {
             break;
         }
 
+        //console.log('serialData before substring', serialData);
         handleSerialMessage(serialData.substring(0, delimiter));
         serialData = serialData.substring(delimiter + 1);
+        //console.log('serialData', serialData);
     };
 });
 
@@ -136,6 +140,7 @@ function broadcastLog(level, text) {
 }
 
 function broadcastCar(car) {
+    console.log('car:', JSON.stringify(car));
     mqttClient.publish('babocar/car', JSON.stringify(car));
 }
 
@@ -255,6 +260,7 @@ const RACE_TRACK_INFO = [
 ];
 
 const TEST_TRACK_INFO = [
+    
     'fast1',
     'slow1_prepare',
     'slow1_chicane1',
@@ -266,7 +272,6 @@ const TEST_TRACK_INFO = [
     'slow2_round2',
     'slow2_end1',
     'slow2_end2',
-    'fast3',
     'slow3_prepare',
     'slow3_chicane1',
     'slow3_chicane2',
