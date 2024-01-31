@@ -140,7 +140,7 @@ function broadcastLog(level, text) {
 }
 
 function broadcastCar(car) {
-    console.log('car:', JSON.stringify(car));
+    //console.log('car:', JSON.stringify(car));
     mqttClient.publish('babocar/car', JSON.stringify(car));
 }
 
