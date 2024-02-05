@@ -19,7 +19,7 @@ function ParameterInput({ name, valueIn, sendParams }) {
                 if (target.key === 'Enter') {
                     inputRef.current.blur();
                     const validPirateStatePattern = /^[A-Z]{3}\d{3}$/;
-                    if (!validPirateStatePattern.test(value)) {
+                    if (value !== 'LANE!!' && !validPirateStatePattern.test(value)) {
                         console.log(`Invalid pirate state received: ${value}`);
                         return;
                     }
