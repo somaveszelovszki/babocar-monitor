@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import socketIO from 'socket.io-client';
 
@@ -15,6 +15,10 @@ import PirateCarPropertiesCard from './components/PirateCarPropertiesCard';
 
 const socket = socketIO.connect('http://localhost:3001');
 
+// Flood-related config
+const FLOOD_MESSAGE_TO_SERIAL = "FLOOD!";
+const FLOOD_PERIOD_TIME_IN_MS = 200;
+
 export default function App() {
     const [car, setCar] = React.useState({ pos_m: null, angle_deg: null, speed_mps: null });
     // Logging-related states
@@ -28,6 +32,10 @@ export default function App() {
 
     // Pirate-related states
     const [pirate, setPirate] = React.useState({ state: 'ACE000' });
+    // Flood-related states
+    const [sendPeriodicFloodMessage, setSendPeriodicFloodMessage] = React.useState(false);
+    // Timer reference to store the interval ID
+    const periodicFloodTimerRef = React.useRef(null);
 
     const publish = React.useCallback((topic, data) => {
         socket.emit('publish', JSON.stringify({ topic, message: JSON.stringify(data) }));
@@ -108,29 +116,59 @@ export default function App() {
         publish('babocar/update-pirate', state);
     }, [publish]);
 
+    const publishFlood = React.useCallback(() => {
+        // WARNING! This console.log can flood (pun intended) the devtools if you uncomment it
+        //console.log(`Send flood message (${FLOOD_MESSAGE_TO_SERIAL})`);
+        publish('babocar/update-pirate', FLOOD_MESSAGE_TO_SERIAL);
+    }, [publish]);
+
     // Optional log filtering based on the selected level
     React.useEffect(() => {
         // Preparing time measurement
-        const now = new Date().getTime();
-        console.time(`logs-filtering-${now}`);
+        //const now = new Date().getTime();
+        //console.time(`logs-filtering-${now}`);
 
         // Optional filtering
         let logsToStore = logs;
         if (selectedLogLevel) {
-            console.log('Filtering logs by level:', { selectedLogLevel });
+            //console.log('Filtering logs by level:', { selectedLogLevel });
             logsToStore = logs.filter(log => log.level === selectedLogLevel);
         }
         if (logFilteringKeyword) {
-            console.log('Filtering logs by keyword:', { logFilteringKeyword });
+            //console.log('Filtering logs by keyword:', { logFilteringKeyword });
             logsToStore = logsToStore.filter(log => log.text.toLowerCase().includes(logFilteringKeyword.toLowerCase()));
         }
 
         // Display time measurement
-        console.timeEnd(`logs-filtering-${now}`);
+        //console.timeEnd(`logs-filtering-${now}`);
 
         // Update state variable
         setLogsToRender(logsToStore);
     }, [logs, selectedLogLevel, logFilteringKeyword])
+
+    useEffect(function sendPeriodicFloodMessageAfterCheckboxChange() {
+        console.log('sendPeriodicFloodMessageAfterCheckboxChange', { sendPeriodicFloodMessage });
+        // Clear existing timer if it exists when sendPeriodicFloodMessage becomes false
+        if (!sendPeriodicFloodMessage && periodicFloodTimerRef.current !== null) {
+            clearInterval(periodicFloodTimerRef.current);
+            periodicFloodTimerRef.current = null;
+        }
+
+        // Start a new timer when sendPeriodicFloodMessage becomes true
+        if (sendPeriodicFloodMessage) {
+            periodicFloodTimerRef.current = setInterval(() => {
+                publishFlood();
+            }, FLOOD_PERIOD_TIME_IN_MS);
+        }
+
+        // Cleanup the timer on component unmount
+        return () => {
+            if (periodicFloodTimerRef.current !== null) {
+                clearInterval(periodicFloodTimerRef.current);
+                periodicFloodTimerRef.current = null;
+            }
+        };
+    }, [sendPeriodicFloodMessage, publishFlood])
 
     return (
         <div className='app'>
@@ -147,6 +185,10 @@ export default function App() {
                                 <PirateCarPropertiesCard
                                     pirate={pirate}
                                     sendParams={publishPirateProperties}
+                                    sendPeriodicFloodMessage={sendPeriodicFloodMessage}
+                                    handlePeriodicFloodMessageCheckboxClick={() => {
+                                        setSendPeriodicFloodMessage((previousValue) => !previousValue)
+                                    }}
                                 />
                             </Col>
                         </Row>

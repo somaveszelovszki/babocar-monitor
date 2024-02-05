@@ -29,7 +29,7 @@ function ParameterInput({ name, valueIn, sendParams }) {
     )
 }
 
-export default function PirateCarPropertiesCard({ pirate, sendParams }) {
+export default function PirateCarPropertiesCard({ pirate, sendParams, sendPeriodicFloodMessage, handlePeriodicFloodMessageCheckboxClick }) {
 
     const inputStyle = {
         display: 'inline-block',
@@ -61,13 +61,17 @@ export default function PirateCarPropertiesCard({ pirate, sendParams }) {
                                 </td>
                             </tr>
                         )}
+                        <tr>
+                            <td>
+                                Send periodic flood message?
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <table style={inputStyle}>
                     <tbody>
                         {Object.entries(pirate).map(([key, value]) => {
                             return (
-
                                 <tr key={key} style={{ height: '60px' }}>
                                     <td>
                                         <ParameterInput
@@ -80,6 +84,15 @@ export default function PirateCarPropertiesCard({ pirate, sendParams }) {
                             )
                         }
                         )}
+                        <tr>
+                            <td>
+                                <Form.Control
+                                    type='checkbox'
+                                    value={sendPeriodicFloodMessage}
+                                    onChange={() => handlePeriodicFloodMessageCheckboxClick()}
+                                />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
