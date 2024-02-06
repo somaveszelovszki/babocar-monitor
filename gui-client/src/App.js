@@ -232,6 +232,7 @@ export default function App() {
                                     handlePeriodicFloodMessageCheckboxClick={() => {
                                         setSendPeriodicFloodMessage((previousValue) => !previousValue)
                                     }}
+                                    sendSingleFloodMessage={() => publishFlood()}
                                 />
                             </Col>
                         </Row>

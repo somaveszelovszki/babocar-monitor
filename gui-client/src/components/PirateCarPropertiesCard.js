@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Form } from 'react-bootstrap';
+import { Button, Card, Form } from 'react-bootstrap';
 
 function ParameterInput({ name, valueIn, sendParams }) {
     const inputRef = React.useRef(null);
@@ -12,7 +12,6 @@ function ParameterInput({ name, valueIn, sendParams }) {
     return (
         <Form.Control
             type='text'
-            ref={inputRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyUp={(target) => {
@@ -29,62 +28,39 @@ function ParameterInput({ name, valueIn, sendParams }) {
     )
 }
 
-export default function PirateCarPropertiesCard({ pirate, sendParams, sendPeriodicFloodMessage, handlePeriodicFloodMessageCheckboxClick }) {
+export default function PirateCarPropertiesCard({
+    pirate,
+    sendParams,
+    sendPeriodicFloodMessage,
+    handlePeriodicFloodMessageCheckboxClick,
+    sendSingleFloodMessage
+}) {
 
-    const inputStyle = {
-        display: 'inline-block',
-        tableLayout: 'fixed',
-        verticalAlign: 'top',
-        width: '7rem'
-    };
-
-    const margin = '15px';
+    const tableCellStyle = { padding: "8px" }
 
     return (
         <Card>
             <Card.Body>
                 <Card.Title>Pirate</Card.Title>
 
-                <table style={{
-                    display: 'inline-block',
-                    overflowX: 'scroll',
-                    verticalAlign: 'top',
-                    width: `calc(100% - ${inputStyle.width} - ${margin})`,
-                    borderLeft: 0,
-                    marginRight: margin
-                }}>
+                <table style={{ width: "100%" }}>
                     <tbody>
-                        {Object.keys(pirate).map((key) =>
-                            <tr key={key} style={{ height: '60px', textAlign: 'left' }}>
-                                <td>
-                                    {key}
-                                </td>
-                            </tr>
-                        )}
                         <tr>
-                            <td>
-                                Send periodic flood message?
+                            <td style={tableCellStyle}>
+                                {pirate.state}
+                            </td>
+                            <td style={{ width: "100px" }}>
+                                <ParameterInput
+                                    name={'state'}
+                                    valueIn={pirate.state}
+                                    sendParams={sendParams}
+                                />
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-                <table style={inputStyle}>
-                    <tbody>
-                        {Object.entries(pirate).map(([key, value]) => {
-                            return (
-                                <tr key={key} style={{ height: '60px' }}>
-                                    <td>
-                                        <ParameterInput
-                                            name={key}
-                                            valueIn={value}
-                                            sendParams={sendParams}
-                                        />
-                                    </td>
-                                </tr>
-                            )
-                        }
-                        )}
                         <tr>
+                            <td style={tableCellStyle}>
+                                Send periodic flood message?
+                            </td>
                             <td>
                                 <Form.Control
                                     type='checkbox'
@@ -93,9 +69,20 @@ export default function PirateCarPropertiesCard({ pirate, sendParams, sendPeriod
                                 />
                             </td>
                         </tr>
+                        <tr>
+                            <td style={tableCellStyle}>
+                                Single flood message
+                            </td>
+                            <td>
+                                <Button
+                                    onClick={() => sendSingleFloodMessage()}
+                                >
+                                    Send
+                                </Button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
-
             </Card.Body>
         </Card>
     )
